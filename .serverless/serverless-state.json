@@ -7,8 +7,8 @@
     "provider": {
       "name": "aws",
       "runtime": "python3.9",
+      "region": "ap-northeast-2",
       "stage": "dev",
-      "region": "us-east-1",
       "versionFunctions": true,
       "compiledCloudFormationTemplate": {
         "AWSTemplateFormatVersion": "2010-09-09",
@@ -167,52 +167,6 @@
               }
             }
           },
-          "EnterpriseLogAccessIamRole": {
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-              "AssumeRolePolicyDocument": {
-                "Version": "2012-10-17",
-                "Statement": [
-                  {
-                    "Effect": "Allow",
-                    "Principal": {
-                      "AWS": "arn:aws:iam::802587217904:root"
-                    },
-                    "Action": "sts:AssumeRole",
-                    "Condition": {
-                      "StringEquals": {
-                        "sts:ExternalId": "ServerlessEnterprise-6e8f2dda-87c4-4202-8394-5b9f6aa9e67a"
-                      }
-                    }
-                  }
-                ]
-              },
-              "Policies": [
-                {
-                  "PolicyName": "LogFilterAccess",
-                  "PolicyDocument": {
-                    "Version": "2012-10-17",
-                    "Statement": [
-                      {
-                        "Effect": "Allow",
-                        "Action": [
-                          "logs:FilterLogEvents"
-                        ],
-                        "Resource": [
-                          {
-                            "Fn::GetAtt": [
-                              "ApiLogGroup",
-                              "Arn"
-                            ]
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                }
-              ]
-            }
-          },
           "ApiLambdaFunction": {
             "Type": "AWS::Lambda::Function",
             "Properties": {
@@ -220,9 +174,9 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/aws-serverless-diet-app/dev/1678983965109-2023-03-16T16:26:05.109Z/aws-serverless-diet-app.zip"
+                "S3Key": "serverless/aws-serverless-diet-app/dev/1679071913595-2023-03-17T16:51:53.595Z/aws-serverless-diet-app.zip"
               },
-              "Handler": "s_api.handler",
+              "Handler": "wsgi_handler.handler",
               "Runtime": "python3.9",
               "FunctionName": "aws-serverless-diet-app-dev-api",
               "MemorySize": 1024,
@@ -238,14 +192,14 @@
               "ApiLogGroup"
             ]
           },
-          "ApiLambdaVersionyEDOhydZHdhnfWnLQ1NIELLVmwrn7rgRwVcCEIBZUzA": {
+          "ApiLambdaVersiongCudTo6MzB2AEzW6CvZEBmymTtzsKrFMjxZkKMMaeg": {
             "Type": "AWS::Lambda::Version",
             "DeletionPolicy": "Retain",
             "Properties": {
               "FunctionName": {
                 "Ref": "ApiLambdaFunction"
               },
-              "CodeSha256": "b/enxTAEivUSaHEo0GTd5GEP9ZZjr+isGYFQwh+bd8U="
+              "CodeSha256": "/sqWU3/X1Wb2IReKBDz+/2BCNyz+3WPgICRd0TXfBLU="
             }
           },
           "HttpApi": {
@@ -253,12 +207,6 @@
             "Properties": {
               "Name": "dev-aws-serverless-diet-app",
               "ProtocolType": "HTTP"
-            }
-          },
-          "HttpApiLogGroup": {
-            "Type": "AWS::Logs::LogGroup",
-            "Properties": {
-              "LogGroupName": "/aws/http-api/aws-serverless-diet-app-dev"
             }
           },
           "HttpApiStage": {
@@ -271,18 +219,8 @@
               "AutoDeploy": true,
               "DefaultRouteSettings": {
                 "DetailedMetricsEnabled": false
-              },
-              "AccessLogSettings": {
-                "DestinationArn": {
-                  "Fn::GetAtt": [
-                    "HttpApiLogGroup",
-                    "Arn"
-                  ]
-                },
-                "Format": "{\"requestTime\":\"$context.requestTime\",\"requestId\":\"$context.requestId\",\"apiId\":\"$context.apiId\",\"resourcePath\":\"$context.routeKey\",\"path\":\"$context.path\",\"httpMethod\":\"$context.httpMethod\",\"stage\":\"$context.stage\",\"status\":\"$context.status\",\"integrationStatus\":\"$context.integrationStatus\",\"integrationLatency\":\"$context.integrationLatency\",\"responseLatency\":\"$context.responseLatency\",\"responseLength\":\"$context.responseLength\",\"errorMessage\":\"$context.error.message\",\"format\":\"SLS_HTTP_API_LOG\",\"version\":\"1.0.0\"}"
               }
-            },
-            "DependsOn": "HttpApiLogGroup"
+            }
           },
           "ApiLambdaPermissionHttpApi": {
             "Type": "AWS::Lambda::Permission",
@@ -355,26 +293,6 @@
               }
             },
             "DependsOn": "HttpApiIntegrationApi"
-          },
-          "CWLSubFilterApiLogGroupUsEast1": {
-            "Type": "AWS::Logs::SubscriptionFilter",
-            "Properties": {
-              "DestinationArn": "arn:aws:logs:us-east-1:802587217904:destination:6e8f2dda-87c4-4202-8394-5b9f6aa9e67a#Lb5cVS9jvZS2xrP3qP#aws-serverless-diet-app#dev",
-              "FilterPattern": "?\"REPORT RequestId: \" ?\"SERVERLESS_ENTERPRISE\"",
-              "LogGroupName": {
-                "Ref": "ApiLogGroup"
-              }
-            }
-          },
-          "CWLSubFilterHttpApiLogGroupUsEast1": {
-            "Type": "AWS::Logs::SubscriptionFilter",
-            "Properties": {
-              "DestinationArn": "arn:aws:logs:us-east-1:802587217904:destination:6e8f2dda-87c4-4202-8394-5b9f6aa9e67a#Lb5cVS9jvZS2xrP3qP#aws-serverless-diet-app#dev",
-              "FilterPattern": "\"SLS_HTTP_API_LOG\"",
-              "LogGroupName": {
-                "Ref": "HttpApiLogGroup"
-              }
-            }
           }
         },
         "Outputs": {
@@ -386,21 +304,10 @@
               "Name": "sls-aws-serverless-diet-app-dev-ServerlessDeploymentBucketName"
             }
           },
-          "EnterpriseLogAccessIamRole": {
-            "Value": {
-              "Fn::GetAtt": [
-                "EnterpriseLogAccessIamRole",
-                "Arn"
-              ]
-            },
-            "Export": {
-              "Name": "sls-aws-serverless-diet-app-dev-EnterpriseLogAccessIamRole"
-            }
-          },
           "ApiLambdaFunctionQualifiedArn": {
             "Description": "Current Lambda function version",
             "Value": {
-              "Ref": "ApiLambdaVersionyEDOhydZHdhnfWnLQ1NIELLVmwrn7rgRwVcCEIBZUzA"
+              "Ref": "ApiLambdaVersiongCudTo6MzB2AEzW6CvZEBmymTtzsKrFMjxZkKMMaeg"
             },
             "Export": {
               "Name": "sls-aws-serverless-diet-app-dev-ApiLambdaFunctionQualifiedArn"
@@ -524,11 +431,6 @@
           }
         }
       },
-      "logs": {
-        "httpApi": {
-          "format": "{\"requestTime\":\"$context.requestTime\",\"requestId\":\"$context.requestId\",\"apiId\":\"$context.apiId\",\"resourcePath\":\"$context.routeKey\",\"path\":\"$context.path\",\"httpMethod\":\"$context.httpMethod\",\"stage\":\"$context.stage\",\"status\":\"$context.status\",\"integrationStatus\":\"$context.integrationStatus\",\"integrationLatency\":\"$context.integrationLatency\",\"responseLatency\":\"$context.responseLatency\",\"responseLength\":\"$context.responseLength\",\"errorMessage\":\"$context.error.message\",\"format\":\"SLS_HTTP_API_LOG\",\"version\":\"1.0.0\"}"
-        }
-      },
       "vpc": {}
     },
     "custom": {
@@ -543,7 +445,7 @@
     "pluginsData": {},
     "functions": {
       "api": {
-        "handler": "s_api.handler",
+        "handler": "wsgi_handler.handler",
         "events": [
           {
             "httpApi": "*",
@@ -556,14 +458,12 @@
         "timeout": 6,
         "runtime": "python3.9",
         "vpc": {},
-        "versionLogicalId": "ApiLambdaVersionyEDOhydZHdhnfWnLQ1NIELLVmwrn7rgRwVcCEIBZUzA"
+        "versionLogicalId": "ApiLambdaVersiongCudTo6MzB2AEzW6CvZEBmymTtzsKrFMjxZkKMMaeg"
       }
     },
     "configValidationMode": "warn",
     "serviceFilename": "serverless.yml",
     "initialServerlessConfig": {
-      "org": "geonui",
-      "app": "aws-serverless-diet-app",
       "service": "aws-serverless-diet-app",
       "frameworkVersion": "3",
       "custom": {
@@ -579,17 +479,12 @@
         "$ref": "$[\"service\"][\"plugins\"]"
       }
     },
-    "app": "aws-serverless-diet-app",
-    "org": "geonui",
     "layers": {},
-    "isDashboardMonitoringPreconfigured": true,
-    "isDashboardAppPreconfigured": true,
-    "orgUid": "6e8f2dda-87c4-4202-8394-5b9f6aa9e67a",
-    "appUid": "Lb5cVS9jvZS2xrP3qP",
-    "artifact": "C:\\Users\\HGH\\Desktop\\hk\\git\\aws-serverless-diet-app\\.serverless\\aws-serverless-diet-app.zip"
+    "isDashboardMonitoringPreconfigured": false,
+    "artifact": "C:\\Users\\HGH\\Desktop\\hk\\git\\subproject\\diet_server\\.serverless\\aws-serverless-diet-app.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/aws-serverless-diet-app/dev/1678983965109-2023-03-16T16:26:05.109Z",
+    "artifactDirectoryName": "serverless/aws-serverless-diet-app/dev/1679071913595-2023-03-17T16:51:53.595Z",
     "artifact": "aws-serverless-diet-app.zip"
   }
 }
