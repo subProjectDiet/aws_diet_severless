@@ -10,3 +10,4 @@ email-validator
 requests
 chardet
 joblib
+sklearn
