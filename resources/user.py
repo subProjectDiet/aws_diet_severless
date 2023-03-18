@@ -5,7 +5,6 @@ from flask_restful import Resource
 from mysql.connector import Error
 import boto3
 from config import Config
-
 from mysql_connection import get_connection
 from email_validator import validate_email, EmailNotValidError
 from flask_jwt_extended import get_jwt_identity
