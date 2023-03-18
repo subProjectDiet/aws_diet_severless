@@ -3,12 +3,14 @@ from flask import request
 from flask_jwt_extended import create_access_token, get_jwt, jwt_required
 from flask_restful import Resource
 from mysql.connector import Error
+import boto3
+from config import Config
 
 from mysql_connection import get_connection
 from email_validator import validate_email, EmailNotValidError
 from flask_jwt_extended import get_jwt_identity
 from utils import check_password, hash_password
-import joblib
+import pickle
 import pandas as pd
 import numpy as np
 
@@ -95,8 +97,12 @@ class UserInfoResource(Resource):
         data = request.get_json()
         user_id = get_jwt_identity()
 
-        kmeans = joblib.load('ml/kmeans.pkl')
-        scaler = joblib.load('ml/scaler.pkl')
+        s3 = boto3.resource('s3',
+                        aws_access_key_id = Config.ACCESS_KEY,
+                        aws_secret_access_key = Config.SECRET_ACCESS)
+
+        kmeans = pickle.loads(s3.Bucket(Config.S3_BUCKET).Object("pickled_kmeans.p").get()['Body'].read())
+        scaler = pickle.loads(s3.Bucket(Config.S3_BUCKET).Object("pickled_scaler.p").get()['Body'].read())
 
         new_data = np.array([data['gender'], data['height'], data['nowWeight']])
         new_data = new_data.reshape(1, 3)
@@ -389,8 +395,12 @@ class UserInfoEditResource(Resource):
         data = request.get_json()
         user_id = get_jwt_identity()
 
-        kmeans = joblib.load('ml/kmeans.pkl')
-        scaler = joblib.load('ml/scaler.pkl')
+        s3 = boto3.resource('s3',
+                        aws_access_key_id = Config.ACCESS_KEY,
+                        aws_secret_access_key = Config.SECRET_ACCESS)
+
+        kmeans = pickle.loads(s3.Bucket(Config.S3_BUCKET).Object("pickled_kmeans.p").get()['Body'].read())
+        scaler = pickle.loads(s3.Bucket(Config.S3_BUCKET).Object("pickled_scaler.p").get()['Body'].read())
 
         new_data = np.array([data['gender'], data['height'], data['nowWeight']])
         new_data = new_data.reshape(1, 3)

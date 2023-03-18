@@ -9,5 +9,4 @@ Flask-JWT-Extended
 email-validator
 requests
 chardet
-joblib
-sklearn
+pickle
