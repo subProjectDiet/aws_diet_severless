@@ -10,4 +10,3 @@ email-validator
 requests
 chardet
 boto3
-pickle
