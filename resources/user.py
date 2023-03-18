@@ -11,7 +11,6 @@ from email_validator import validate_email, EmailNotValidError
 from flask_jwt_extended import get_jwt_identity
 from utils import check_password, hash_password
 import pickle
-import pandas as pd
 import numpy as np
 
 
@@ -90,32 +89,38 @@ class UserRegisterResource(Resource) :
 # // 0 : 남자
 # // 1 : 여자
 
-
-
-# 유저 목표 정보 입력 API
-class UserTargetResource(Resource):
-        # 리뷰 평가 api
+# 유저 추가정보 API
+class UserInfoResource(Resource):
     @jwt_required()
     def post(self) :
-
-        # {
-        #     "targetKcal": 1400,
-        #     "targetCarbs": 100,
-        #     "targetProtein": 150,
-        #     "targetFat": 130
-        # }
-        
         data = request.get_json()
         user_id = get_jwt_identity()
+
+        s3 = boto3.resource('s3',
+                        aws_access_key_id = Config.ACCESS_KEY,
+                        aws_secret_access_key = Config.SECRET_ACCESS)
+
+        kmeans = pickle.loads(s3.Bucket(Config.S3_BUCKET).Object("pickled_kmeans.p").get()['Body'].read())
+        scaler = pickle.loads(s3.Bucket(Config.S3_BUCKET).Object("pickled_scaler.p").get()['Body'].read())
+
+        new_data = np.array([data['gender'], data['height'], data['nowWeight']])
+        new_data = new_data.reshape(1, 3)
+        new_data = scaler.transform(new_data)
+        group = kmeans.predict(new_data)[0]
+
+        group = int(group)
+        print(group)
 
         try :
             connection = get_connection()
 
-            query = '''insert into userTarget(userId, targetKcal, targetCarbs, targetProtein,targetFat)
+        
+
+            query = '''insert into userInfo(userId, gender, age, height,nowWeight, hopeWeight, activity, `group`)
                        values
-                       (%s, %s, %s,%s, %s);'''
-            record = ( user_id, data['targetKcal'],
-                        data['targetCarbs'], data['targetProtein'], data['targetFat'])
+                       (%s, %s, %s,%s, %s, %s, %s, %s);'''
+            record = ( user_id, data['gender'],
+                        data['age'], data['height'], data['nowWeight'],data['hopeWeight'],data['activity'] ,group)
             
             cursor = connection.cursor()
             cursor.execute(query, record)
@@ -328,8 +333,102 @@ class UserNicknameUniqueResource(Resource) :
             "items" : result_list }, 200
 
 
-# 유저 추가정보 수정 API
+class UserTargetResource(Resource):
+        # 리뷰 평가 api
+    @jwt_required()
+    def post(self) :
 
+        # {
+        #     "targetKcal": 1400,
+        #     "targetCarbs": 100,
+        #     "targetProtein": 150,
+        #     "targetFat": 130
+        # }
+        
+        data = request.get_json()
+        user_id = get_jwt_identity()
+
+        try :
+            connection = get_connection()
+
+            query = '''insert into userTarget(userId, targetKcal, targetCarbs, targetProtein,targetFat)
+                       values
+                       (%s, %s, %s,%s, %s);'''
+            record = ( user_id, data['targetKcal'],
+                        data['targetCarbs'], data['targetProtein'], data['targetFat'])
+            
+            cursor = connection.cursor()
+            cursor.execute(query, record)
+            connection.commit()
+
+            cursor.close()
+            connection.close()
+
+        except Error as e :
+            print(e)
+            cursor.close()
+            connection.close()
+            return {'error' : str(e)}, 500
+                
+        return {'result' : 'success'} , 200
+
+# 유저 추가정보 수정 API
+class UserInfoEditResource(Resource):
+    @jwt_required()
+    def put(self) :
+         
+        data = request.get_json()
+        user_id = get_jwt_identity()
+
+        s3 = boto3.resource('s3',
+                        aws_access_key_id = Config.ACCESS_KEY,
+                        aws_secret_access_key = Config.SECRET_ACCESS)
+
+        kmeans = pickle.loads(s3.Bucket(Config.S3_BUCKET).Object("pickled_kmeans.p").get()['Body'].read())
+        scaler = pickle.loads(s3.Bucket(Config.S3_BUCKET).Object("pickled_scaler.p").get()['Body'].read())
+
+        new_data = np.array([data['gender'], data['height'], data['nowWeight']])
+        new_data = new_data.reshape(1, 3)
+        new_data = scaler.transform(new_data)
+        group = kmeans.predict(new_data)[0]
+
+        group = int(group)
+        print(group)
+
+        # {
+        #     "gender": 1,
+        #     "age": 23,
+        #     "height": 160.3,
+        #     "nowWeight": 50.2,
+        #     "hopeWeight": 47.3,
+        #     "activity": 1
+        # }
+       
+
+        try :
+            connection = get_connection()
+
+            query = '''update userInfo
+                    set gender = %s, age= %s , height = %s, nowWeight = %s, hopeWeight = %s, activity = %s, `group`= %s
+                    where userId = %s;
+                    '''
+            record = ( data['gender'],
+                        data['age'], data['height'], data['nowWeight'],data['hopeWeight'],data['activity'] ,group ,user_id)
+            
+            cursor = connection.cursor()
+            cursor.execute(query, record)
+            connection.commit()
+
+            cursor.close()
+            connection.close()
+
+        except Error as e :
+            print(e)
+            cursor.close()
+            connection.close()
+            return {'error' : str(e)}, 500
+                
+        return {'result' : 'success'} , 200
 
 class UserTargetEditResource(Resource):
     @jwt_required()

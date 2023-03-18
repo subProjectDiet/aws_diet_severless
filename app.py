@@ -2,7 +2,7 @@ from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
 from config import Config
-from resources.user import UserTargetEditResource,UserEmailUniqueResource,UserNicknameUniqueResource,UserRegisterResource, UserTargetResource, UserLoginResource, UserLogoutResource, UserNicknameResetResource
+from resources.user import UserTargetEditResource,UserInfoEditResource,UserEmailUniqueResource,UserNicknameUniqueResource,UserRegisterResource, UserInfoResource, UserTargetResource, UserLoginResource, UserLogoutResource, UserNicknameResetResource
 from resources.exercise import ExerciseKcalResource, ExerciseKeywordSearchResource, ExerciseSelectSearchResource, ExerciseKcalModifyDelete,ExerciseUserDirectResource, ExerciseUserDirectModifyResource, ExerciseDateKcalSum, ExerciseDateKcalList
 from resources.user import jwt_blacklist
 from resources.posting import LikeResource,MyLikePostingListResource,OrderListResource,PostingEditResource,PostingClickResource, MypostingListResource, PostingResource, PostingTagResource, LikeResource, MyLikePostingListResource, OrderListResource
@@ -35,6 +35,7 @@ api = Api(app)
 
 # 회원관리부분
 api.add_resource(UserRegisterResource, '/user/register')
+api.add_resource(UserInfoResource, '/user/info')
 api.add_resource(UserTargetResource, '/user/target')
 api.add_resource(UserLoginResource, '/user/login')
 api.add_resource(UserLogoutResource, '/user/logout')
@@ -45,6 +46,7 @@ api.add_resource(UserNicknameUniqueResource, '/user/nickname')
 
 # 유저 정보 수정
 api.add_resource(UserNicknameResetResource, '/user/edit/nickname')
+api.add_resource(UserInfoEditResource, '/user/edit/info')
 api.add_resource(UserTargetEditResource, '/user/edit/target')
 
 
