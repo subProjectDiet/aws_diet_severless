@@ -97,12 +97,12 @@ class UserInfoResource(Resource):
         data = request.get_json()
         user_id = get_jwt_identity()
 
-        s3 = boto3.resource('s3',
+        s3 = boto3.client('s3',
                         aws_access_key_id = Config.ACCESS_KEY,
                         aws_secret_access_key = Config.SECRET_ACCESS)
 
-        kmeans = pickle.loads(s3.Bucket(Config.S3_BUCKET).Object("pickled_kmeans.p").get()['Body'].read())
-        scaler = pickle.loads(s3.Bucket(Config.S3_BUCKET).Object("pickled_scaler.p").get()['Body'].read())
+        kmeans = pickle.loads(s3.get_object(Bucket=Config.S3_BUCKET, Key="pickled_kmeans.p")['Body'].read())
+        scaler = pickle.loads(s3.get_object(Bucket=Config.S3_BUCKET, Key="pickled_scaler.p")['Body'].read())
 
         new_data = np.array([data['gender'], data['height'], data['nowWeight']])
         new_data = new_data.reshape(1, 3)
@@ -112,29 +112,15 @@ class UserInfoResource(Resource):
         group = int(group)
         print(group)
 
-
-        # {
-        #     "gender": 1,
-        #     "age": 23,
-        #     "height": 160.3,
-        #     "nowWeight": 50.2,
-        #     "hopeWeight": 47.3,
-        #     "activity": 1
-        # }
-        
-
-
         try :
             connection = get_connection()
-
-        
 
             query = '''insert into userInfo(userId, gender, age, height,nowWeight, hopeWeight, activity, `group`)
                        values
                        (%s, %s, %s,%s, %s, %s, %s, %s);'''
             record = ( user_id, data['gender'],
                         data['age'], data['height'], data['nowWeight'],data['hopeWeight'],data['activity'] ,group)
-            
+
             cursor = connection.cursor()
             cursor.execute(query, record)
             connection.commit()
@@ -147,7 +133,7 @@ class UserInfoResource(Resource):
             cursor.close()
             connection.close()
             return {'error' : str(e)}, 500
-                
+
         return {'result' : 'success'} , 200
 
 
