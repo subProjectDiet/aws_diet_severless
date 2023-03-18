@@ -12,7 +12,7 @@ from resources.calorie import FoodRecordBreakfastResource, FoodRecordDinnerResou
 from resources.calorie import FoodRecordTotalCarbsResource, FoodRecordTotalDayResource, FoodRecordTotalFatResource, FoodRecordTotalProteinResource
 from resources.eda import DayEdaResource, WeekEdaResource, MonthEdaResource
 from resources.positng_coment import PostingComentEditResource, PostingComentResource
-
+from resources.recommend import KmeansRecommendResource
 
 
 app = Flask(__name__)
@@ -114,7 +114,9 @@ api.add_resource(DayEdaResource, '/eda/day')
 api.add_resource(WeekEdaResource, '/eda/week')
 api.add_resource(MonthEdaResource, '/eda/month')
 
-#확인확인
+# 추천 시스템
+api.add_resource(KmeansRecommendResource, '/recommend')
+
 
 
 

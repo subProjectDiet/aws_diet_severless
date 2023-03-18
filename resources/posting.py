@@ -390,7 +390,7 @@ class PostingClickResource(Resource):
         try :
             connection = get_connection()
 
-            query = '''select p.id , u.id ,u.nickName,p.createdAt ,p.imgurl, count(lp.userId)as좋아요 ,p.content
+            query = '''select p.id , u.id ,u.nickName,p.createdAt ,p.imgurl, count(lp.userId)as likeCnt ,p.content
                                 from posting p
                                 left join user u
                                 on p.userId = u.id

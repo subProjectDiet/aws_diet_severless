@@ -8,11 +8,16 @@ from mysql_connection import get_connection
 from email_validator import validate_email, EmailNotValidError
 from flask_jwt_extended import get_jwt_identity
 from utils import check_password, hash_password
+import joblib
+import pandas as pd
+import numpy as np
 
 
 # 회원가입
 class UserRegisterResource(Resource) :
     def post(self) :
+
+
         # {
         #     "email": "ccc@naver.com",
         #     "nickName": "나나나"
@@ -79,11 +84,28 @@ class UserRegisterResource(Resource) :
 
         return {"result" : "success", "access_token" : access_token}, 200
 
+
+# // 0 : 남자
+# // 1 : 여자
+
 # 유저 추가정보 API
 class UserInfoResource(Resource):
-        # 리뷰 평가 api
     @jwt_required()
     def post(self) :
+        data = request.get_json()
+        user_id = get_jwt_identity()
+
+        kmeans = joblib.load('ml/kmeans.pkl')
+        scaler = joblib.load('ml/scaler.pkl')
+
+        new_data = np.array([data['gender'], data['height'], data['nowWeight']])
+        new_data = new_data.reshape(1, 3)
+        new_data = scaler.transform(new_data)
+        group = kmeans.predict(new_data)[0]
+
+        group = int(group)
+        print(group)
+
 
         # {
         #     "gender": 1,
@@ -94,17 +116,18 @@ class UserInfoResource(Resource):
         #     "activity": 1
         # }
         
-        data = request.get_json()
-        user_id = get_jwt_identity()
+
 
         try :
             connection = get_connection()
 
-            query = '''insert into userInfo(userId, gender, age, height,nowWeight, hopeWeight, activity)
+        
+
+            query = '''insert into userInfo(userId, gender, age, height,nowWeight, hopeWeight, activity, `group`)
                        values
-                       (%s, %s, %s,%s, %s, %s, %s);'''
+                       (%s, %s, %s,%s, %s, %s, %s, %s);'''
             record = ( user_id, data['gender'],
-                        data['age'], data['height'], data['nowWeight'],data['hopeWeight'],data['activity'] )
+                        data['age'], data['height'], data['nowWeight'],data['hopeWeight'],data['activity'] ,group)
             
             cursor = connection.cursor()
             cursor.execute(query, record)
@@ -362,6 +385,20 @@ class UserNicknameUniqueResource(Resource) :
 class UserInfoEditResource(Resource):
     @jwt_required()
     def put(self) :
+         
+        data = request.get_json()
+        user_id = get_jwt_identity()
+
+        kmeans = joblib.load('ml/kmeans.pkl')
+        scaler = joblib.load('ml/scaler.pkl')
+
+        new_data = np.array([data['gender'], data['height'], data['nowWeight']])
+        new_data = new_data.reshape(1, 3)
+        new_data = scaler.transform(new_data)
+        group = kmeans.predict(new_data)[0]
+
+        group = int(group)
+        print(group)
 
         # {
         #     "gender": 1,
@@ -371,19 +408,17 @@ class UserInfoEditResource(Resource):
         #     "hopeWeight": 47.3,
         #     "activity": 1
         # }
-        
-        data = request.get_json()
-        user_id = get_jwt_identity()
+       
 
         try :
             connection = get_connection()
 
             query = '''update userInfo
-                    set gender = %s, age= %s , height = %s, nowWeight = %s, hopeWeight = %s, activity = %s
+                    set gender = %s, age= %s , height = %s, nowWeight = %s, hopeWeight = %s, activity = %s, `group`= %s
                     where userId = %s;
                     '''
             record = ( data['gender'],
-                        data['age'], data['height'], data['nowWeight'],data['hopeWeight'],data['activity'] ,user_id)
+                        data['age'], data['height'], data['nowWeight'],data['hopeWeight'],data['activity'] ,group ,user_id)
             
             cursor = connection.cursor()
             cursor.execute(query, record)
