@@ -2,7 +2,6 @@ from flask import request
 from flask_jwt_extended import jwt_required
 from flask_restful import Resource
 from mysql.connector import Error
-
 from flask_jwt_extended import get_jwt_identity
 from mysql_connection import get_connection
 from datetime import datetime
