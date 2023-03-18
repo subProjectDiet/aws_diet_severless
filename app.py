@@ -114,7 +114,7 @@ api.add_resource(DayEdaResource, '/eda/day')
 api.add_resource(WeekEdaResource, '/eda/week')
 api.add_resource(MonthEdaResource, '/eda/month')
 
-
+#확인확인
 
 
 
