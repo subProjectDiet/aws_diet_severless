@@ -1,8 +1,11 @@
+from datetime import datetime
 from flask import request
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import create_access_token, get_jwt, jwt_required
 from flask_restful import Resource
 from mysql.connector import Error
+
 from mysql_connection import get_connection
+from email_validator import validate_email, EmailNotValidError
 from flask_jwt_extended import get_jwt_identity
 
 # 다이어리에 유저 몸무게 입력 

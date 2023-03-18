@@ -9,3 +9,4 @@ Flask-JWT-Extended
 email-validator
 requests
 chardet
+
