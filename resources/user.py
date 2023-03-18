@@ -10,9 +10,7 @@ from mysql_connection import get_connection
 from email_validator import validate_email, EmailNotValidError
 from flask_jwt_extended import get_jwt_identity
 from utils import check_password, hash_password
-import pickle
-import pandas as pd
-import numpy as np
+
 
 
 # 회원가입
@@ -97,29 +95,29 @@ class UserInfoResource(Resource):
         data = request.get_json()
         user_id = get_jwt_identity()
 
-        s3 = boto3.client('s3',
-                        aws_access_key_id = Config.ACCESS_KEY,
-                        aws_secret_access_key = Config.SECRET_ACCESS)
+        # s3 = boto3.client('s3',
+        #                 aws_access_key_id = Config.ACCESS_KEY,
+        #                 aws_secret_access_key = Config.SECRET_ACCESS)
 
-        kmeans = pickle.loads(s3.get_object(Bucket=Config.S3_BUCKET, Key="pickled_kmeans.p")['Body'].read())
-        scaler = pickle.loads(s3.get_object(Bucket=Config.S3_BUCKET, Key="pickled_scaler.p")['Body'].read())
+        # kmeans = pickle.loads(s3.get_object(Bucket=Config.S3_BUCKET, Key="pickled_kmeans.p")['Body'].read())
+        # scaler = pickle.loads(s3.get_object(Bucket=Config.S3_BUCKET, Key="pickled_scaler.p")['Body'].read())
 
-        new_data = np.array([data['gender'], data['height'], data['nowWeight']])
-        new_data = new_data.reshape(1, 3)
-        new_data = scaler.transform(new_data)
-        group = kmeans.predict(new_data)[0]
+        # new_data = np.array([data['gender'], data['height'], data['nowWeight']])
+        # new_data = new_data.reshape(1, 3)
+        # new_data = scaler.transform(new_data)
+        # group = kmeans.predict(new_data)[0]
 
-        group = int(group)
-        print(group)
+        # group = int(group)
+        # print(group)
 
         try :
             connection = get_connection()
 
-            query = '''insert into userInfo(userId, gender, age, height,nowWeight, hopeWeight, activity, `group`)
+            query = '''insert into userInfo(userId, gender, age, height,nowWeight, hopeWeight, activity)
                        values
-                       (%s, %s, %s,%s, %s, %s, %s, %s);'''
+                       (%s, %s, %s,%s, %s, %s, %s);'''
             record = ( user_id, data['gender'],
-                        data['age'], data['height'], data['nowWeight'],data['hopeWeight'],data['activity'] ,group)
+                        data['age'], data['height'], data['nowWeight'],data['hopeWeight'],data['activity'])
 
             cursor = connection.cursor()
             cursor.execute(query, record)
@@ -381,20 +379,20 @@ class UserInfoEditResource(Resource):
         data = request.get_json()
         user_id = get_jwt_identity()
 
-        s3 = boto3.resource('s3',
-                        aws_access_key_id = Config.ACCESS_KEY,
-                        aws_secret_access_key = Config.SECRET_ACCESS)
+        # s3 = boto3.resource('s3',
+        #                 aws_access_key_id = Config.ACCESS_KEY,
+        #                 aws_secret_access_key = Config.SECRET_ACCESS)
 
-        kmeans = pickle.loads(s3.Bucket(Config.S3_BUCKET).Object("pickled_kmeans.p").get()['Body'].read())
-        scaler = pickle.loads(s3.Bucket(Config.S3_BUCKET).Object("pickled_scaler.p").get()['Body'].read())
+        # kmeans = pickle.loads(s3.Bucket(Config.S3_BUCKET).Object("pickled_kmeans.p").get()['Body'].read())
+        # scaler = pickle.loads(s3.Bucket(Config.S3_BUCKET).Object("pickled_scaler.p").get()['Body'].read())
 
-        new_data = np.array([data['gender'], data['height'], data['nowWeight']])
-        new_data = new_data.reshape(1, 3)
-        new_data = scaler.transform(new_data)
-        group = kmeans.predict(new_data)[0]
+        # new_data = np.array([data['gender'], data['height'], data['nowWeight']])
+        # new_data = new_data.reshape(1, 3)
+        # new_data = scaler.transform(new_data)
+        # group = kmeans.predict(new_data)[0]
 
-        group = int(group)
-        print(group)
+        # group = int(group)
+        # print(group)
 
         # {
         #     "gender": 1,
@@ -410,11 +408,11 @@ class UserInfoEditResource(Resource):
             connection = get_connection()
 
             query = '''update userInfo
-                    set gender = %s, age= %s , height = %s, nowWeight = %s, hopeWeight = %s, activity = %s, `group`= %s
+                    set gender = %s, age= %s , height = %s, nowWeight = %s, hopeWeight = %s, activity = %s
                     where userId = %s;
                     '''
             record = ( data['gender'],
-                        data['age'], data['height'], data['nowWeight'],data['hopeWeight'],data['activity'] ,group ,user_id)
+                        data['age'], data['height'], data['nowWeight'],data['hopeWeight'],data['activity'] ,user_id)
             
             cursor = connection.cursor()
             cursor.execute(query, record)
