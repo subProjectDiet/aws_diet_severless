@@ -9,4 +9,6 @@ Flask-JWT-Extended
 email-validator
 requests
 chardet
+boto3
 pickle
+sklearn

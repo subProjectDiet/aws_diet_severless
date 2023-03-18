@@ -11,7 +11,6 @@ from email_validator import validate_email, EmailNotValidError
 from flask_jwt_extended import get_jwt_identity
 from utils import check_password, hash_password
 import pickle
-import pandas as pd
 import numpy as np
 
 
