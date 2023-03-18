@@ -11,4 +11,3 @@ requests
 chardet
 boto3
 pickle
-sklearn
