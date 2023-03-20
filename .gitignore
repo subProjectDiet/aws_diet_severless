@@ -125,6 +125,10 @@ venv.bak/
 .dmypy.json
 dmypy.json
 
+#깃저장소
+.git
+*.pack
+
 # Pyre type checker
 .pyre/
 node_modules
