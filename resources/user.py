@@ -6,6 +6,7 @@ from mysql.connector import Error
 import boto3
 from config import Config
 
+
 from mysql_connection import get_connection
 from email_validator import validate_email, EmailNotValidError
 from flask_jwt_extended import get_jwt_identity
@@ -111,6 +112,18 @@ class UserInfoResource(Resource):
         group = int(group)
         print(group)
 
+
+        # {
+        #     "gender": 1,
+        #     "age": 23,
+        #     "height": 160.3,
+        #     "nowWeight": 50.2,
+        #     "hopeWeight": 47.3,
+        #     "activity": 1
+        # }
+        
+
+
         try :
             connection = get_connection()
 
@@ -121,6 +134,47 @@ class UserInfoResource(Resource):
                        (%s, %s, %s,%s, %s, %s, %s, %s);'''
             record = ( user_id, data['gender'],
                         data['age'], data['height'], data['nowWeight'],data['hopeWeight'],data['activity'] ,group)
+            
+            cursor = connection.cursor()
+            cursor.execute(query, record)
+            connection.commit()
+
+            cursor.close()
+            connection.close()
+
+        except Error as e :
+            print(e)
+            cursor.close()
+            connection.close()
+            return {'error' : str(e)}, 500
+                
+        return {'result' : 'success'} , 200
+
+
+# 유저 목표 정보 입력 API
+class UserTargetResource(Resource):
+        # 리뷰 평가 api
+    @jwt_required()
+    def post(self) :
+
+        # {
+        #     "targetKcal": 1400,
+        #     "targetCarbs": 100,
+        #     "targetProtein": 150,
+        #     "targetFat": 130
+        # }
+        
+        data = request.get_json()
+        user_id = get_jwt_identity()
+
+        try :
+            connection = get_connection()
+
+            query = '''insert into userTarget(userId, targetKcal, targetCarbs, targetProtein,targetFat)
+                       values
+                       (%s, %s, %s,%s, %s);'''
+            record = ( user_id, data['targetKcal'],
+                        data['targetCarbs'], data['targetProtein'], data['targetFat'])
             
             cursor = connection.cursor()
             cursor.execute(query, record)
@@ -332,45 +386,6 @@ class UserNicknameUniqueResource(Resource) :
         return { "result" : "success" ,
             "items" : result_list }, 200
 
-
-class UserTargetResource(Resource):
-        # 리뷰 평가 api
-    @jwt_required()
-    def post(self) :
-
-        # {
-        #     "targetKcal": 1400,
-        #     "targetCarbs": 100,
-        #     "targetProtein": 150,
-        #     "targetFat": 130
-        # }
-        
-        data = request.get_json()
-        user_id = get_jwt_identity()
-
-        try :
-            connection = get_connection()
-
-            query = '''insert into userTarget(userId, targetKcal, targetCarbs, targetProtein,targetFat)
-                       values
-                       (%s, %s, %s,%s, %s);'''
-            record = ( user_id, data['targetKcal'],
-                        data['targetCarbs'], data['targetProtein'], data['targetFat'])
-            
-            cursor = connection.cursor()
-            cursor.execute(query, record)
-            connection.commit()
-
-            cursor.close()
-            connection.close()
-
-        except Error as e :
-            print(e)
-            cursor.close()
-            connection.close()
-            return {'error' : str(e)}, 500
-                
-        return {'result' : 'success'} , 200
 
 # 유저 추가정보 수정 API
 class UserInfoEditResource(Resource):
