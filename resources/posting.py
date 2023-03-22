@@ -390,7 +390,7 @@ class PostingClickResource(Resource):
         try :
             connection = get_connection()
 
-            query = '''select p.id , u.id ,u.nickName,p.createdAt ,p.imgurl, count(lp.userId)as likeCnt ,p.content,
+            query = '''select p.id as postingId , u.id as userId ,u.nickName,p.createdAt ,p.imgurl, count(lp.userId)as likeCnt ,p.content,
                                 if(lp.userId is null, 0 , 1) as isLike 
                                 from posting p
                                 left join user u
@@ -438,7 +438,7 @@ class MypostingListResource(Resource) :
         user_id = get_jwt_identity()
         try : 
             connection = get_connection()
-            query = '''select p.id, p.userId, u.nickName,p.content, p.imgurl, p.createdAt, p.updatedAt , count(lp.postingId) as likeCnt,
+            query = '''select p.id as postingId, p.userId, u.nickName,p.content, p.imgurl, p.createdAt, p.updatedAt , count(lp.postingId) as likeCnt,
                     if(lp.userId is null, 0 , 1) as isLike 
                     from posting p
                     join user u
