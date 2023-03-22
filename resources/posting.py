@@ -390,7 +390,8 @@ class PostingClickResource(Resource):
         try :
             connection = get_connection()
 
-            query = '''select p.id , u.id ,u.nickName,p.createdAt ,p.imgurl, count(lp.userId)as likeCnt ,p.content
+            query = '''select p.id , u.id ,u.nickName,p.createdAt ,p.imgurl, count(lp.userId)as likeCnt ,p.content,
+                                if(lp.userId is null, 0 , 1) as isLike 
                                 from posting p
                                 left join user u
                                 on p.userId = u.id
@@ -437,9 +438,15 @@ class MypostingListResource(Resource) :
         user_id = get_jwt_identity()
         try : 
             connection = get_connection()
-            query = '''select *
-                    from posting
-                    where userId = %s
+            query = '''select p.id, p.userId, u.nickName,p.content, p.imgurl, p.createdAt, p.updatedAt , count(lp.postingId) as likeCnt,
+                    if(lp.userId is null, 0 , 1) as isLike 
+                    from posting p
+                    join user u
+                    on p.userId = u.id
+                    left join likePosting lp
+                    on p.id = lp.postingId
+                    where p.userId = %s
+                    group by lp.postingId
                     limit ''' + offset + ''', ''' + limit + ''';'''
                     
             record = (user_id , )
@@ -484,7 +491,7 @@ class PostingTagResource(Resource):
 
         try :
             connection = get_connection()
-            query = f'''select p.id , u.id, u.nickName , p.imgurl, p.createdAt, p.content, count(lp.userId)as좋아요
+            query = f'''select p.id , u.id, u.nickName , p.imgurl, p.createdAt, p.content, count(lp.userId)as likeCnt
                             from tagName tn
                             left join tag t
                             on tn.id = t.tagId
@@ -533,7 +540,8 @@ class MyLikePostingListResource(Resource):
         user_id = get_jwt_identity()
         try : 
             connection = get_connection()
-            query = '''select  p.id as postingId,p.userId, u.nickName,p.content, p.imgurl, p.createdAt, p.updatedAt , count(l.postingId) as `like`, l.createdAt as likeTime
+            query = '''select  p.id as postingId,p.userId, u.nickName,p.content, p.imgurl, p.createdAt, p.updatedAt , count(l.postingId) as likeCnt, l.createdAt as likeTime,
+                    if(l.userId is null, 0 , 1) as isLike 
                     from posting p
                     join user u
                     on p.userId = u.id
@@ -586,8 +594,11 @@ class OrderListResource(Resource):
         user_id = get_jwt_identity()
         try : 
             connection = get_connection()
-            query = '''select p.id, p.userId,p.content, p.imgurl, p.createdAt, p.updatedAt , count(l.postingId) as likeCnt
+            query = '''select p.id, p.userId, u.nickName,p.content, p.imgurl, p.createdAt, p.updatedAt , count(l.postingId) as likeCnt,
+                    if(lp.userId is null, 0 , 1) as isLike 
                     from posting p
+                    join user u
+                    on p.userId = u.id
                     left join likePosting l
                     on p.id = l.postingId
                     group by l.postingId
