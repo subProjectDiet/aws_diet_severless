@@ -13,25 +13,29 @@ class KmeansRecommendResource(Resource):
     @jwt_required()
     def get(self):
 
-        group = request.args.get('group')
+        user_id = get_jwt_identity()
 
         try : 
             connection = get_connection()
-            query = '''select p.id as postingId, ui.userId, u.nickName,  p.content, p.imgUrl, p.createdAt, p.updatedAt, count(l.postingId) as likeCnt, ui.`group`
-                   from userInfo ui
-                    join user u
-                    on ui.userId = u.id
-                    left join posting p
-                    on ui.userId = p.userId
-                    join likePosting l
-                    on p.id = l.postingId
-                    where `group` = %s
-                    group by l.postingId
-                    order by likeCnt desc
-                    limit 1;
-                    '''
+            query = '''select p.id as postingId, ui.userId, u.nickName,  p.content, p.imgUrl, p.createdAt, p.updatedAt, count(l.postingId) as likeCnt, ui.`group`,
+                        if(l.userId is null, 0 , 1) as isLike 
+                        from userInfo ui
+                        join user u
+                        on ui.userId = u.id
+                        left join posting p
+                        on ui.userId = p.userId
+                        join likePosting l
+                        on p.id = l.postingId
+                        where `group` = (select `group`
+                                        from user u  
+                                        join userInfo ui
+                                        on u.id = ui.userId
+                                        where u.id = %s)
+                        group by l.postingId
+                        order by likeCnt desc
+                        limit 1;'''
 
-            record = (group, )
+            record = (user_id, )
             cursor = connection.cursor(dictionary=True)
             cursor.execute(query, record)
 
