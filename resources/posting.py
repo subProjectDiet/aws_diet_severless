@@ -594,14 +594,13 @@ class OrderListResource(Resource):
         user_id = get_jwt_identity()
         try : 
             connection = get_connection()
-            query = '''select p.id, p.userId, u.nickName,p.content, p.imgurl, p.createdAt, p.updatedAt , count(l.postingId) as likeCnt,
-                    if(l.userId is null, 0 , 1) as isLike 
+            query = '''select p.id, p.userId, u.nickName,p.content, p.imgurl, p.createdAt, p.updatedAt , count(p.id) as likeCnt
                     from posting p
-                    join user u
+                    left join user u
                     on p.userId = u.id
-                    left join likePosting l
-                    on p.id = l.postingId
-                    group by l.postingId
+                    left join likePosting lp
+                    on p.id = lp.postingId
+                    group by p.id
                     order by ''' + order + ''' desc
                     limit ''' + offset + ''', '''+ limit + ''';'''
 
