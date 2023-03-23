@@ -425,7 +425,7 @@ class PostingClickResource(Resource):
         # print(result_list)
 
         return {"result" : "success" ,
-                "items" : result_list , 
+                "items" : result_list[0] , 
                 "count" : len(result_list)}, 200
         
         
