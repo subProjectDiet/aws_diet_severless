@@ -16,209 +16,44 @@ from datetime import datetime
 class PostingEditResource(Resource):
     @jwt_required()
     def put(self,posting_id):
-       
+
+        data = request.get_json()
         user_id = get_jwt_identity()
 
-        if 'photo' not in request.files:
+        # S3에 파일 업로드가 필요 없으므로, 디비에 저장한다.
+        try :
+            # DB에 연결
+            connection = get_connection()
 
-            content = request.form['content']
-            # S3에 파일 업로드가 필요 없으므로, 디비에 저장한다.
-            try :
-                # DB에 연결
-                connection = get_connection()
+            # 쿼리문 만들기
+            query = f'''update posting set
 
-                # 쿼리문 만들기
-                query = f'''update posting set
+                    content = %s
+                    where userId = {user_id} and id = {posting_id};'''
 
-                        content = %s
-                        where userId = {user_id} and id = {posting_id};'''
+            record = (data['content'],)
 
-                record = (content,)
+            # 커서를 가져온다.
+            cursor = connection.cursor()
 
-                # 커서를 가져온다.
-                cursor = connection.cursor()
+            # 쿼리문을 커서를 이용해서 실행한다.
+            cursor.execute(query, record)
 
-                # 쿼리문을 커서를 이용해서 실행한다.
-                cursor.execute(query, record)
+            # 커넥션을 커밋해줘야 한다 => 디비에 영구적으로 반영하라는 뜻
+            connection.commit()
 
-                # 커넥션을 커밋해줘야 한다 => 디비에 영구적으로 반영하라는 뜻
-                connection.commit()
+            # 자원 해제
+            cursor.close()
+            connection.close()
 
-                # 자원 해제
-                cursor.close()
-                connection.close()
+        except Error as e :
+            print(e)
+            cursor.close()
+            connection.close()
+            return {'error' : str(e)}, 500
 
-            except Error as e :
-                print(e)
-                cursor.close()
-                connection.close()
-                return {'error' : str(e)}, 500
+        return {'result' : 'success'}, 200
 
-            return {'result' : 'success'}, 200
-
-        else :
-            content = request.form['content']
-            file = request.files['photo']
-            # 파일이 있으니까, 파일명을 새로 만들어서
-            # S3 에 업로드한다.
-
-            # 2. S3 에 파일 업로드
-            # 파일명을 우리가 변경해 준다.
-            # 파일명은, 유니크하게 만들어야 한다.
-            current_time = datetime.now()
-            new_file_name = current_time.isoformat().replace(':', '_') + '.jpg'
-
-            # 유저가 올린 파일의 이름을, 내가 만든 파일명으로 변경
-            file.filename = new_file_name
-
-            # S3 에 업로드 하면 된다.
-            # AWS 의 라이브러리를 사용해야 한다.
-            # 이 파이썬 라이브러리가 boto3 라이브러리다!
-            # boto3 라이브러리 설치
-            # pip install boto3 
-
-            s3 = boto3.client('s3', 
-                        aws_access_key_id = Config.ACCESS_KEY,
-                        aws_secret_access_key = Config.SECRET_ACCESS)
-
-            try :
-                s3.upload_fileobj(file,
-                                    Config.S3_BUCKET,
-                                    file.filename,
-                                    ExtraArgs = {'ACL':'public-read', 'ContentType':file.content_type} )                 
-
-            except Exception as e :
-                return {'error' : str(e)}, 500
-
-            client = boto3.client('rekognition',
-                        'ap-northeast-2',
-                        aws_access_key_id=Config.ACCESS_KEY,
-                        aws_secret_access_key = Config.SECRET_ACCESS)
-
-            response = client.detect_labels(Image={'S3Object':{'Bucket':Config.S3_BUCKET, 'Name':new_file_name}} ,
-                                MaxLabels = 5 )
-
-            print(response)
-
-            name_list = []
-            for row in response['Labels'] :
-                name  = row['Name']  
-                
-                # 네이버 파파고 API 호출한다.
-                headers = {'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8',
-                    'X-Naver-Client-Id' : Config.NAVER_CLIENT_ID,
-                    'X-Naver-Client-Secret' : Config.NAVER_CLIENT_SECRET}
-
-                data = {'source' : 'en',
-                        'target' : 'ko',
-                        'text' : name}
-
-                res = requests.post(Config.NAVER_PAPAGO_URL, data, headers= headers)
-
-                
-                res = res.json()
-
-                result_text = res['message']['result']['translatedText']
-                name_list.append(result_text)
-
-
-
-            # 데이터 베이스에 업데이트 해준다.
-            imgUrl = Config.S3_LOCATION + new_file_name
-            try :
-                connection = get_connection()
-                
-
-
-
-               
-                query=  f'''delete from t
-                        using tag t
-                        left join tagName tn
-                        on t.tagId = tn.id
-                        left join posting p
-                        on p.id = t.postingId
-                    where p.userId = {user_id} and t.postingId = {posting_id}'''
-                cursor = connection.cursor(dictionary= True)
-                cursor.execute(query, )
-                connection.commit()
-                cursor.close()
-                connection.close()    
-
-            except Exception as e :
-                return {'error' : str(e)}, 500
-                
-            
-            
-            
-            
-            
-            try :
-                # DB에 연결
-                connection = get_connection()
-
-                # 쿼리문 만들기
-                query = f'''update posting set 
-                            imgUrl = %s,
-                            content = %s
-                            where userId = {user_id} and id = {posting_id};'''
-
-                record = (imgUrl, content)
-
-                for name in name_list :
-                    query = '''select *
-                            from tagName
-                            where Name = %s;'''
-                    record = (name , )
-                    cursor = connection.cursor(dictionary=True)
-                    cursor.execute(query, record)
-                    result_list = cursor.fetchall()
-                    
-                    
-                    if len(result_list) == 0 :
-                        query = '''insert into tagName
-                                (Name)
-                                values
-                                (%s);'''
-                        record = (name, )
-                        cursor.execute(query, record)
-                        tag_id = cursor.lastrowid
-                    else :
-                        tag_id = result_list[0]['id']
-
-
-                    
-                    # tag테이블에 저장한다.
-                    query = '''insert into tag
-                            (tagId,postingId)
-                            values
-                            ( %s, %s);'''
-                    record = (tag_id,posting_id )
-                    cursor.execute(query, record)
-
-
-
-
-                # 커서를 가져온다.
-                cursor = connection.cursor()
-
-                # 쿼리문을 커서를 이용해서 실행한다.
-                cursor.execute(query, record)
-
-                # 커넥션을 커밋해줘야 한다 => 디비에 영구적으로 반영하라는 뜻
-                connection.commit()
-
-                # 자원 해제
-                cursor.close()
-                connection.close()
-
-            except Error as e :
-                print(e)
-                cursor.close()
-                connection.close()
-                return {'error' : str(e)}, 500
-
-            return {'result' : 'success'}, 200
     
 
     @jwt_required()
