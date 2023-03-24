@@ -491,7 +491,8 @@ class PostingTagResource(Resource):
 
         try :
             connection = get_connection()
-            query = f'''select p.id , u.id, u.nickName , p.imgurl, p.createdAt, p.content, count(lp.userId)as likeCnt
+            query = f'''select p.id , u.id, u.nickName , p.imgurl, p.createdAt, p.content, count(lp.userId)as likeCnt,
+                            if(lp.userId is null, 0 , 1) as isLike 
                             from tagName tn
                             left join tag t
                             on tn.id = t.tagId
