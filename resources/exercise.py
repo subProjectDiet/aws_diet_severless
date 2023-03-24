@@ -259,9 +259,9 @@ class ExerciseSelectSearchResource(Resource):
             connection.close()
             return {"error" : str(e)}, 500
 
-
         return {"result" : "success" ,
-                "items" : result_list[0]}, 200
+                "items" : result_list , 
+                "count" : len(result_list)}, 200
 
 # 유저가 직접 운동 칼로리 입력하고 수정하는 API 부분
 class ExerciseUserDirectResource(Resource):
