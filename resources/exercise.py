@@ -260,7 +260,7 @@ class ExerciseSelectSearchResource(Resource):
             return {"error" : str(e)}, 500
 
 
-
+        
         return {"result" : "success" ,
                 "items" : result_list , 
                 "count" : len(result_list)}, 200
@@ -393,14 +393,17 @@ class ExerciseDateKcalList(Resource):
     @jwt_required()
     def get(self) :
         date = request.args.get('date')
+        offset = request.args.get('offset')
+        limit = request.args.get('limit')
 
         user_id = get_jwt_identity()
 
         try :
             connection = get_connection()
-            query = ''' select * from
+            query = f''' select * from
                     exerciseRecord
-                    where userId = %s and date = %s ;'''
+                    where userId = %s and date = %s
+                    limit {limit} offset {offset};'''
 
             record = (user_id, date)
 
