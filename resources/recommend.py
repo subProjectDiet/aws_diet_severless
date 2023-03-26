@@ -18,7 +18,7 @@ class KmeansRecommendResource(Resource):
         try : 
             connection = get_connection()
             query = '''select p.id as postingId, ui.userId, u.nickName,  p.content, p.imgUrl, p.createdAt, p.updatedAt, count(l.postingId) as likeCnt, ui.`group`,
-                        if(l.userId is null, 0 , 1) as isLike 
+                        if(lp.userId is null, 0 , 1) as isLike 
                         from userInfo ui
                         join user u
                         on ui.userId = u.id
@@ -26,6 +26,8 @@ class KmeansRecommendResource(Resource):
                         on ui.userId = p.userId
                         join likePosting l
                         on p.id = l.postingId
+                        left join likePosting lp
+                        on p.id = lp.postingId and lp.userId = %s
                         where `group` = (select `group`
                                         from user u  
                                         join userInfo ui
@@ -35,7 +37,7 @@ class KmeansRecommendResource(Resource):
                         order by likeCnt desc
                         limit 1;'''
 
-            record = (user_id, )
+            record = (user_id, user_id)
             cursor = connection.cursor(dictionary=True)
             cursor.execute(query, record)
 
