@@ -224,18 +224,23 @@ class PostingClickResource(Resource):
     def get(self,posting_id):
         try :
             connection = get_connection()
+            user_id = get_jwt_identity()
 
-            query = '''select p.id as postingId , u.id as userId ,u.nickName,p.createdAt ,p.imgurl, count(lp.userId)as likeCnt ,p.content,
-                                if(lp.userId is null, 0 , 1) as isLike 
-                                from posting p
-                                left join user u
-                                on p.userId = u.id
-                                left join likePosting lp
-                                on p.id = lp.postingId
-                        where p.id = %s;
+            # 수정완료
+            query = '''select p.id, p.userId, u.nickName,p.content, p.imgurl, p.createdAt, count(lp.postingId) as likeCnt,
+                    if(l.userId is null, 0 , 1) as isLike
+                    from posting p
+                    left join user u
+                    on p.userId = u.id
+                    left join likePosting lp
+                    on p.id = lp.postingId
+                    left join likePosting l
+                    on p.id = l.postingId and l.userId = %s
+                    where p.id = %s
+                    group by p.id
                     '''
 
-            record = (posting_id, )
+            record = (user_id, posting_id )
             cursor = connection.cursor(dictionary= True)
             cursor.execute(query,record)
 
@@ -273,18 +278,22 @@ class MypostingListResource(Resource) :
         user_id = get_jwt_identity()
         try : 
             connection = get_connection()
+
+            # 수정완료
             query = '''select p.id as postingId, p.userId, u.nickName,p.content, p.imgurl, p.createdAt, p.updatedAt , count(lp.postingId) as likeCnt,
-                    if(lp.userId is null, 0 , 1) as isLike 
+                    if(l.userId is null, 0 , 1) as isLike 
                     from posting p
                     join user u
                     on p.userId = u.id
                     left join likePosting lp
                     on p.id = lp.postingId
+                    left join likePosting l
+                    on p.id = l.postingId and l.userId = %s
                     where p.userId = %s
                     group by lp.postingId
                     limit ''' + offset + ''', ''' + limit + ''';'''
                     
-            record = (user_id , )
+            record = (user_id , user_id)
 
             cursor = connection.cursor(dictionary=True)
             cursor.execute(query, record)
@@ -323,11 +332,13 @@ class PostingTagResource(Resource):
         offset = request.args.get('offset')
         limit = request.args.get('limit')
 
+        user_id = get_jwt_identity()
 
         try :
+            # 수정완료
             connection = get_connection()
             query = f'''select p.id , u.id, u.nickName , p.imgurl, p.createdAt, p.content, count(lp.userId)as likeCnt,
-                            if(lp.userId is null, 0 , 1) as isLike 
+                            if(l.userId is null, 0 , 1) as isLike 
                             from tagName tn
                             left join tag t
                             on tn.id = t.tagId
@@ -337,10 +348,12 @@ class PostingTagResource(Resource):
                             on p.userId = u.id
                             left join likePosting lp
                             on lp.postingId = p.id
+                            left join likePosting l
+                            on p.id = l.postingId and l.userId = %s
                             where tn.Name = %s
                             limit {limit} offset {offset};		'''
                         
-            record = (Name,)
+            record = (user_id, Name)
             cursor = connection.cursor(dictionary=True)
             cursor.execute(query,record )
             result_list = cursor.fetchall()
@@ -376,19 +389,22 @@ class MyLikePostingListResource(Resource):
         user_id = get_jwt_identity()
         try : 
             connection = get_connection()
+            # 수정완료
             query = '''select  p.id as postingId,p.userId, u.nickName,p.content, p.imgurl, p.createdAt, p.updatedAt , count(l.postingId) as likeCnt, l.createdAt as likeTime,
-                    if(l.userId is null, 0 , 1) as isLike 
+                    if(lp.userId is null, 0 , 1) as isLike 
                     from posting p
                     join user u
                     on p.userId = u.id
                     left join likePosting l
                     on p.id = l.postingId
+                    left join likePosting lp
+                    on p.id = lp.postingId and lp.userId = %s
                     where l.userId = %s
                     group by l.postingId
                     order by likeTime desc
                     limit ''' + offset + ''', '''+ limit + ''';'''
 
-            record = (user_id , )
+            record = (user_id ,user_id )
 
             cursor = connection.cursor(dictionary=True)
             cursor.execute(query, record)
@@ -430,20 +446,25 @@ class OrderListResource(Resource):
         user_id = get_jwt_identity()
         try : 
             connection = get_connection()
-            query = '''select p.id, p.userId, u.nickName,p.content, p.imgurl, p.createdAt, p.updatedAt , count(lp.postingId) as likeCnt,
-                    if(lp.userId is null, 0 , 1) as isLike
+
+            # 수정완료
+            query = '''select p.id, p.userId, u.nickName,p.content, p.imgurl, p.createdAt, p.updatedAt, count(lp.postingId) as likeCnt,
+                    if(l.userId is null, 0 , 1) as isLike
                     from posting p
                     left join user u
                     on p.userId = u.id
                     left join likePosting lp
                     on p.id = lp.postingId
+                    left join likePosting l
+                    on p.id = l.postingId and l.userId = %s
                     group by p.id
                     order by ''' + order + ''' desc
                     limit ''' + offset + ''', '''+ limit + ''';'''
 
+            record = (user_id , )
 
             cursor = connection.cursor(dictionary=True)
-            cursor.execute(query, )
+            cursor.execute(query, record)
 
             result_list = cursor.fetchall()
 
