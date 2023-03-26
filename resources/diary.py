@@ -94,12 +94,17 @@ class DiaryUserWeightResource(Resource):
                     where userId = %s and date = %s;'''
 
 
-            record = (date , user_id)
+            record = (user_id , date)
 
             cursor = connection.cursor(dictionary=True)
             cursor.execute(query, record)
 
             result_list = cursor.fetchall()
+
+            i = 0
+            for row in result_list :
+                result_list[i]['date'] = row['date'].isoformat()
+                i = i + 1
 
 
             cursor.close()
@@ -113,7 +118,7 @@ class DiaryUserWeightResource(Resource):
 
 
         return {'result' : 'success',
-                'items' : result_list ,
+                'items' : result_list[0] ,
                 'count' : len(result_list)  }, 200
 
 
