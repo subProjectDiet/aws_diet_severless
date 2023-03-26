@@ -448,7 +448,7 @@ class OrderListResource(Resource):
             connection = get_connection()
 
             # 수정완료
-            query = '''select p.id as postingId, p.userId, u.nickName,p.content, p.imgurl, p.createdAt, p.updatedAt, count(lp.postingId) as likeCnt,
+            query = '''select p.id,p.id as postingId, p.userId, u.nickName,p.content, p.imgurl, p.createdAt, p.updatedAt, count(lp.postingId) as likeCnt,
                     if(l.userId is null, 0 , 1) as isLike
                     from posting p
                     left join user u
