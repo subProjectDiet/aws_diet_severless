@@ -227,7 +227,7 @@ class PostingClickResource(Resource):
             user_id = get_jwt_identity()
 
             # 수정완료
-            query = '''select p.id, p.userId, u.nickName,p.content, p.imgurl, p.createdAt, count(lp.postingId) as likeCnt,
+            query = '''select p.id,p.id as postingId, p.userId, u.nickName,p.content, p.imgurl, p.createdAt, count(lp.postingId) as likeCnt,
                     if(l.userId is null, 0 , 1) as isLike
                     from posting p
                     left join user u

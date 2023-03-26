@@ -78,6 +78,45 @@ class DiaryUserWeightResource(Resource):
             return {'error' : str(e)} , 500
 
         return {'result' : 'success'} , 200
+    
+
+    # 특정한 날 몸무게 데이터 가져오는 API
+    @jwt_required()
+    def get(self):
+        date = request.args.get('date')
+
+        user_id = get_jwt_identity()
+        try : 
+            connection = get_connection()
+
+            query = '''select *
+                    from diary
+                    where userId = %s and date = %s;'''
+
+
+            record = (date , user_id)
+
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query, record)
+
+            result_list = cursor.fetchall()
+
+
+            cursor.close()
+            connection.close()
+
+        except Error as e :
+            print(e)
+            cursor.close()
+            connection.close()
+            return {'error' : str(e)} , 500
+
+
+        return {'result' : 'success',
+                'items' : result_list ,
+                'count' : len(result_list)  }, 200
+
+
 
 class DiaryEdaResource(Resource):
     @jwt_required()
