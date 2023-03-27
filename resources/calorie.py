@@ -20,27 +20,35 @@ class FoodSearchResource(Resource):
         offset = request.args.get('offset')
         limit = request.args.get('limit')
         keyword = request.args.get('keyword')
+
         try:
-            conn = get_connection()
-            cursor = conn.cursor(dictionary=True)
+            connection = get_connection()
+
             query = """select id, foodName, gram, kcal, carbs, protein, fat
-
-           from food
-           where foodName like '%""" + keyword + """%'
-           limit """ + limit + """ offset """ + offset + """;"""
+                    from food
+                    where foodName like '%""" + keyword + """%'
+                    limit """ + limit + """ offset """ + offset + """;"""
                     
-            cursor.execute(query)
-            result = cursor.fetchall()
-            return {"result": result, "count" : len(result)}, 200
-        
-        except Exception as e:
-            print(e)
-            return ("errer" + str(e)), 500
-        
-        finally:
-            conn.close()
-            cursor.close()
 
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query, )
+
+            result_list = cursor.fetchall()
+
+
+            cursor.close()
+            connection.close()
+
+        except Error as e :
+            print(e)
+            cursor.close()
+            connection.close()
+            return {'error' : str(e)} , 500
+
+
+        return {'result' : 'success',
+                'items' : result_list ,
+                'count' : len(result_list)  }, 200
 
 
 #검색한 음식 한개띄워주기    
