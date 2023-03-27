@@ -23,7 +23,8 @@ class FoodSearchResource(Resource):
         try:
             conn = get_connection()
             cursor = conn.cursor(dictionary=True)
-            query = """select id, foodName
+            query = """select id, foodName, gram, kcal, carbs, protein, fat
+
            from food
            where foodName like '%""" + keyword + """%'
            limit """ + limit + """ offset """ + offset + """;"""
