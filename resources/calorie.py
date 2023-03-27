@@ -382,7 +382,7 @@ class FoodRecordTotalBreakfast(Resource):
         try:
             connection = get_connection()
 
-            query = f'''SELECT sum(kcal)
+            query = f'''SELECT sum(kcal) as totalKcal
                     FROM foodRecord
                     WHERE mealtime = 0
                     AND date = '{date}' AND userId = {user_id}
@@ -417,7 +417,7 @@ class FoodRecordTotalLunchResource(Resource):
         try:
             connection = get_connection()
 
-            query = f'''SELECT sum(kcal)
+            query = f'''SELECT sum(kcal) as totalKcal
                     FROM foodRecord
                     WHERE mealtime = 1
                     AND date = '{date}' AND userId = {user_id}
@@ -451,7 +451,7 @@ class FoodRecordTotalDinnerResource(Resource):
         try:
             connection = get_connection()
 
-            query = f'''SELECT sum(kcal)
+            query = f'''SELECT sum(kcal) as totalKcal
                     FROM foodRecord
                     WHERE mealtime = 2
                     AND date = '{date}' AND userId = {user_id}
@@ -486,7 +486,7 @@ class FoodRecordTotalCarbsResource(Resource):
         try:
             connection = get_connection()
 
-            query = f'''SELECT sum(carbs)
+            query = f'''SELECT sum(carbs) as totalKcal
                     FROM foodRecord
                     WHERE date = '{date}' 
                     AND userId = {user_id}
@@ -521,7 +521,7 @@ class FoodRecordTotalProteinResource(Resource):
         try:
             connection = get_connection()
 
-            query = f'''SELECT sum(protein)
+            query = f'''SELECT sum(protein) as totalKcal
                     FROM foodRecord
                     WHERE date = '{date}' 
                     AND userId = {user_id}
@@ -555,7 +555,7 @@ class FoodRecordTotalFatResource(Resource):
         try:
             connection = get_connection()
 
-            query = f'''SELECT sum(fat)
+            query = f'''SELECT sum(fat) as totalKcal
                     FROM foodRecord
                     WHERE date = '{date}' 
                     AND userId = {user_id}
@@ -590,7 +590,7 @@ class FoodRecordTotalDayResource(Resource):
         try:
             connection = get_connection()
 
-            query = f'''SELECT sum(kcal)
+            query = f'''SELECT sum(kcal) as totalKcal
                     FROM foodRecord
                     WHERE date = '{date}' 
                     AND userId = {user_id}
