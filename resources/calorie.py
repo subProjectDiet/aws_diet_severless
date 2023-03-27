@@ -255,13 +255,15 @@ class FoodRecordBreakfastResource(Resource):
         date_str = request.args.get('date')
         date = datetime.strptime(date_str, '%Y-%m-%d').date()
         user_id = get_jwt_identity()
-
+        offset = request.args.get('offset')
+        limit = request.args.get('limit')
         try:
             connection = get_connection()
 
             query = f'''SELECT *
                     FROM foodRecord
-                    WHERE mealtime = 0 AND date = '{date}' AND userId = {user_id};'''
+                    WHERE mealtime = 0 AND date = '{date}' AND userId = {user_id}
+                    limit ''' + offset + ''', ''' + limit + ''';'''
 
             cursor = connection.cursor(dictionary=True)
             cursor.execute(query)
@@ -289,13 +291,17 @@ class FoodRecordLunchResource(Resource):
         date_str = request.args.get('date')
         date = datetime.strptime(date_str, '%Y-%m-%d').date()
         user_id = get_jwt_identity()
+        offset = request.args.get('offset')
+        limit = request.args.get('limit')
 
         try:
             connection = get_connection()
 
             query = f'''SELECT *
                     FROM foodRecord
-                    WHERE mealtime = 1 AND date = '{date}' AND userId = {user_id};'''
+                    WHERE mealtime = 1 AND date = '{date}' AND userId = {user_id}
+                    limit ''' + offset + ''', ''' + limit + ''';'''
+
 
             cursor = connection.cursor(dictionary=True)
             cursor.execute(query)
@@ -322,13 +328,17 @@ class FoodRecordDinnerResource(Resource):
         date_str = request.args.get('date')
         date = datetime.strptime(date_str, '%Y-%m-%d').date()
         user_id = get_jwt_identity()
+        offset = request.args.get('offset')
+        limit = request.args.get('limit')
 
         try:
             connection = get_connection()
 
             query = f'''SELECT *
                     FROM foodRecord
-                    WHERE mealtime = 2 AND date = '{date}' AND userId = {user_id};'''
+                    WHERE mealtime = 2 AND date = '{date}' AND userId = {user_id}
+                    limit ''' + offset + ''', ''' + limit + ''';'''
+
 
             cursor = connection.cursor(dictionary=True)
             cursor.execute(query)
