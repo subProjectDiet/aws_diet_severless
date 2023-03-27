@@ -403,7 +403,7 @@ class FoodRecordTotalBreakfast(Resource):
             return {"error": str(e)}, 500
 
         return {"result": "success",
-                "items": json.loads(json.dumps(result_list, default=str)),
+                "items": json.loads(json.dumps(result_list[0], default=str)),
                 "count": len(result_list)}, 200
     
 #특정날짜 점심 kcal
@@ -438,7 +438,7 @@ class FoodRecordTotalLunchResource(Resource):
             return {"error": str(e)}, 500
 
         return {"result": "success",
-                "items": json.loads(json.dumps(result_list, default=str)),
+                "items": json.loads(json.dumps(result_list[0], default=str)),
                 "count": len(result_list)}, 200
 #특정날짜 저녁 kcal
 class FoodRecordTotalDinnerResource(Resource):
@@ -472,7 +472,7 @@ class FoodRecordTotalDinnerResource(Resource):
             return {"error": str(e)}, 500
 
         return {"result": "success",
-                "items": json.loads(json.dumps(result_list, default=str)),
+                "items": json.loads(json.dumps(result_list[0], default=str)),
                 "count": len(result_list)}, 200
 
 #특정날짜 탄수화물 총합
@@ -507,7 +507,7 @@ class FoodRecordTotalCarbsResource(Resource):
             return {"error": str(e)}, 500
 
         return {"result": "success",
-                "items": json.loads(json.dumps(result_list, default=str)),
+                "items": json.loads(json.dumps(result_list[0], default=str)),
                 "count": len(result_list)}, 200
     
 #특정날짜 단백질 총합
@@ -542,7 +542,7 @@ class FoodRecordTotalProteinResource(Resource):
             return {"error": str(e)}, 500
 
         return {"result": "success",
-                "items": json.loads(json.dumps(result_list, default=str)),
+                "items": json.loads(json.dumps(result_list[0], default=str)),
                 "count": len(result_list)}, 200
 #특정날짜 지방 총합
 class FoodRecordTotalFatResource(Resource):
@@ -576,7 +576,7 @@ class FoodRecordTotalFatResource(Resource):
             return {"error": str(e)}, 500
 
         return {"result": "success",
-                "items": json.loads(json.dumps(result_list, default=str)),
+                "items": json.loads(json.dumps(result_list[0], default=str)),
                 "count": len(result_list)}, 200
 
 #특정날짜 먹은 kcal총합
@@ -611,5 +611,5 @@ class FoodRecordTotalDayResource(Resource):
             return {"error": str(e)}, 500
 
         return {"result": "success",
-                "items": json.loads(json.dumps(result_list, default=str)),
+                "items": json.loads(json.dumps(result_list[0], default=str)),
                 "count": len(result_list)}, 200
