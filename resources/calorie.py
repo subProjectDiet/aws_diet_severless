@@ -187,10 +187,13 @@ class FoodRecordEditResource(Resource):
     @jwt_required()
     def put(self, record_id):
 # {
-#     "foodName" :"김치나베",
-#     "gram" :50,
-#     "kcal":400,
-#     "mealtime" : 2
+#     "foodName": "김치나베",
+#     "gram": 50,
+#     "kcal": 154,
+#     "carbs": 50,
+#     "protein": 80,
+#     "fat": 80,
+#     "mealtime": 0
 # }
 
         data = request.get_json()
@@ -198,10 +201,6 @@ class FoodRecordEditResource(Resource):
 
         try:
             connection = get_connection()
-            kcal = data['kcal']
-            carbs = round(kcal * 0.25 / 4)
-            protein = round(kcal * 0.25 / 4)
-            fat = round(kcal * 0.5 / 9)
 
             query = '''UPDATE foodRecord 
                     SET 
@@ -214,7 +213,7 @@ class FoodRecordEditResource(Resource):
                         mealtime = %s
                     WHERE id = %s AND userId = %s;'''
 
-            record = (data['foodName'], data['gram'], kcal, carbs, protein, fat, data['mealtime'], record_id, user_id)
+            record = (data['foodName'], data['gram'],data['kcal'], data['carbs'], data['protein'], data['fat'], data['mealtime'], record_id, user_id)
 
             cursor = connection.cursor()
             cursor.execute(query, record)
