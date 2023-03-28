@@ -155,9 +155,9 @@ class FoodRecordUserResource(Resource):
 
         try :
             kcal = data['kcal']
-            carbs = round(kcal * 0.25 / 4)
-            protein = round(kcal * 0.25 / 4)
-            fat = round(kcal * 0.5 / 9)
+            carbs = round(kcal * 0.5 / 4)
+            protein = round(kcal * 0.3 / 4)
+            fat = round(kcal  * 0.2 / 9)
             
             
             connection = get_connection()
