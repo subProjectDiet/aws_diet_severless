@@ -392,8 +392,8 @@ class DiaryMonthListResource(Resource):
             return {"error" : str(e)}, 500
                 
         return {"result" : "success" ,
-                "items" : result_list , 
-                "count" : len(result_list)}, 200
+                    "item" : result_list[0],
+                    "count" : len(result_list)}, 200
 
 
                 
