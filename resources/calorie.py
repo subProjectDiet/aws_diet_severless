@@ -269,7 +269,7 @@ class FoodRecordBreakfastResource(Resource):
         try:
             connection = get_connection()
 
-            query = f'''SELECT fr.id, fr.userId, f.id as foodId, fr.gram, fr.kcal, fr.carbs, fr.protein, fr.fat, fr.mealtime, fr.date, fr.recordType
+            query = f'''SELECT fr.id, fr.userId, f.id as foodId,fr.foodName, fr.gram, fr.kcal, fr.carbs, fr.protein, fr.fat, fr.mealtime, fr.date, fr.recordType
                     FROM foodRecord fr
                     join food f
                     on fr.foodName = f.foodName
@@ -308,7 +308,7 @@ class FoodRecordLunchResource(Resource):
         try:
             connection = get_connection()
 
-            query = f'''SELECT fr.id, fr.userId, f.id as foodId, fr.gram, fr.kcal, fr.carbs, fr.protein, fr.fat, fr.mealtime, fr.date, fr.recordType
+            query = f'''SELECT fr.id, fr.userId, f.id as foodId,fr.foodName, fr.gram, fr.kcal, fr.carbs, fr.protein, fr.fat, fr.mealtime, fr.date, fr.recordType
                     FROM foodRecord fr
                     join food f
                     on fr.foodName = f.foodName
@@ -347,7 +347,7 @@ class FoodRecordDinnerResource(Resource):
         try:
             connection = get_connection()
 
-            query = f'''SELECT fr.id, fr.userId, f.id as foodId, fr.gram, fr.kcal, fr.carbs, fr.protein, fr.fat, fr.mealtime, fr.date, fr.recordType
+            query = f'''SELECT fr.id, fr.userId, f.id as foodId,fr.foodName, fr.gram, fr.kcal, fr.carbs, fr.protein, fr.fat, fr.mealtime, fr.date, fr.recordType
                     FROM foodRecord fr
                     join food f
                     on fr.foodName = f.foodName
