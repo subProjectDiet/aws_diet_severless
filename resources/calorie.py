@@ -24,7 +24,7 @@ class FoodSearchResource(Resource):
         try:
             connection = get_connection()
 
-            query = """select id, foodName, gram, kcal, carbs, protein, fat
+            query = """select id as foodId, foodName, gram, kcal, carbs, protein, fat
                     from food
                     where foodName like '%""" + keyword + """%'
                     limit """ + limit + """ offset """ + offset + """;"""
@@ -59,7 +59,7 @@ class FoodResource(Resource):
         try :
             connection = get_connection()
 
-            query = '''select id,foodName,gram,kcal,carbs,protein,fat
+            query = '''select id as foodId ,foodName,gram,kcal,carbs,protein,fat
                         from food
                         where id = %s;
                     '''
@@ -269,8 +269,10 @@ class FoodRecordBreakfastResource(Resource):
         try:
             connection = get_connection()
 
-            query = f'''SELECT *
-                    FROM foodRecord
+            query = f'''SELECT fr.id, fr.userId, f.id as foodId, fr.gram, fr.kcal, fr.carbs, fr.protein, fr.fat, fr.mealtime, fr.date, fr.recordType
+                    FROM foodRecord fr
+                    join food f
+                    on fr.foodName = f.foodName
                     WHERE mealtime = 0 AND date = '{date}' AND userId = {user_id}
                     limit ''' + offset + ''', ''' + limit + ''';'''
 
@@ -306,8 +308,10 @@ class FoodRecordLunchResource(Resource):
         try:
             connection = get_connection()
 
-            query = f'''SELECT *
-                    FROM foodRecord
+            query = f'''SELECT fr.id, fr.userId, f.id as foodId, fr.gram, fr.kcal, fr.carbs, fr.protein, fr.fat, fr.mealtime, fr.date, fr.recordType
+                    FROM foodRecord fr
+                    join food f
+                    on fr.foodName = f.foodName
                     WHERE mealtime = 1 AND date = '{date}' AND userId = {user_id}
                     limit ''' + offset + ''', ''' + limit + ''';'''
 
@@ -343,8 +347,10 @@ class FoodRecordDinnerResource(Resource):
         try:
             connection = get_connection()
 
-            query = f'''SELECT *
-                    FROM foodRecord
+            query = f'''SELECT fr.id, fr.userId, f.id as foodId, fr.gram, fr.kcal, fr.carbs, fr.protein, fr.fat, fr.mealtime, fr.date, fr.recordType
+                    FROM foodRecord fr
+                    join food f
+                    on fr.foodName = f.foodName
                     WHERE mealtime = 2 AND date = '{date}' AND userId = {user_id}
                     limit ''' + offset + ''', ''' + limit + ''';'''
 
