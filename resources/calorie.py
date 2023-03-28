@@ -271,7 +271,7 @@ class FoodRecordBreakfastResource(Resource):
 
             query = f'''SELECT fr.id, fr.userId, f.id as foodId,fr.foodName, fr.gram, fr.kcal, fr.carbs, fr.protein, fr.fat, fr.mealtime, fr.date, fr.recordType
                     FROM foodRecord fr
-                    join food f
+                    left join food f
                     on fr.foodName = f.foodName
                     WHERE mealtime = 0 AND date = '{date}' AND userId = {user_id}
                     limit ''' + offset + ''', ''' + limit + ''';'''
@@ -310,7 +310,7 @@ class FoodRecordLunchResource(Resource):
 
             query = f'''SELECT fr.id, fr.userId, f.id as foodId,fr.foodName, fr.gram, fr.kcal, fr.carbs, fr.protein, fr.fat, fr.mealtime, fr.date, fr.recordType
                     FROM foodRecord fr
-                    join food f
+                    left join food f
                     on fr.foodName = f.foodName
                     WHERE mealtime = 1 AND date = '{date}' AND userId = {user_id}
                     limit ''' + offset + ''', ''' + limit + ''';'''
@@ -349,7 +349,7 @@ class FoodRecordDinnerResource(Resource):
 
             query = f'''SELECT fr.id, fr.userId, f.id as foodId,fr.foodName, fr.gram, fr.kcal, fr.carbs, fr.protein, fr.fat, fr.mealtime, fr.date, fr.recordType
                     FROM foodRecord fr
-                    join food f
+                    left join food f
                     on fr.foodName = f.foodName
                     WHERE mealtime = 2 AND date = '{date}' AND userId = {user_id}
                     limit ''' + offset + ''', ''' + limit + ''';'''
