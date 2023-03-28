@@ -269,17 +269,23 @@ class FoodRecordBreakfastResource(Resource):
         try:
             connection = get_connection()
 
-            query = f'''SELECT fr.id, fr.userId, f.id as foodId,fr.foodName, fr.gram, fr.kcal, fr.carbs, fr.protein, fr.fat, fr.mealtime, fr.date, fr.recordType
+            query = f'''SELECT fr.id, fr.userId, f.id as foodId,fr.foodName, fr.gram, fr.kcal, fr.carbs, fr.protein, fr.fat, fr.mealtime, fr.date, fr.recordType, fr.createdAt
                     FROM foodRecord fr
                     left join food f
                     on fr.foodName = f.foodName
                     WHERE mealtime = 0 AND date = '{date}' AND userId = {user_id}
+                    order by createdAt desc
                     limit ''' + offset + ''', ''' + limit + ''';'''
 
             cursor = connection.cursor(dictionary=True)
             cursor.execute(query)
 
             result_list = cursor.fetchall()
+
+            i = 0
+            for row in result_list :
+                result_list[i]['createdAt'] = row['createdAt'].isoformat()
+                i = i + 1
 
             cursor.close()
             connection.close()
@@ -308,11 +314,12 @@ class FoodRecordLunchResource(Resource):
         try:
             connection = get_connection()
 
-            query = f'''SELECT fr.id, fr.userId, f.id as foodId,fr.foodName, fr.gram, fr.kcal, fr.carbs, fr.protein, fr.fat, fr.mealtime, fr.date, fr.recordType
+            query = f'''SELECT fr.id, fr.userId, f.id as foodId,fr.foodName, fr.gram, fr.kcal, fr.carbs, fr.protein, fr.fat, fr.mealtime, fr.date, fr.recordType, fr.createdAt
                     FROM foodRecord fr
                     left join food f
                     on fr.foodName = f.foodName
                     WHERE mealtime = 1 AND date = '{date}' AND userId = {user_id}
+                    order by createdAt desc
                     limit ''' + offset + ''', ''' + limit + ''';'''
 
 
@@ -320,6 +327,11 @@ class FoodRecordLunchResource(Resource):
             cursor.execute(query)
 
             result_list = cursor.fetchall()
+
+            i = 0
+            for record in result_list :
+                result_list[i]['createdAt'] = record['createdAt'].isoformat()
+                i = i + 1
 
             cursor.close()
             connection.close()
@@ -347,11 +359,12 @@ class FoodRecordDinnerResource(Resource):
         try:
             connection = get_connection()
 
-            query = f'''SELECT fr.id, fr.userId, f.id as foodId,fr.foodName, fr.gram, fr.kcal, fr.carbs, fr.protein, fr.fat, fr.mealtime, fr.date, fr.recordType
+            query = f'''SELECT fr.id, fr.userId, f.id as foodId,fr.foodName, fr.gram, fr.kcal, fr.carbs, fr.protein, fr.fat, fr.mealtime, fr.date, fr.recordType, fr.createdAt
                     FROM foodRecord fr
                     left join food f
                     on fr.foodName = f.foodName
                     WHERE mealtime = 2 AND date = '{date}' AND userId = {user_id}
+                    order by createdAt desc
                     limit ''' + offset + ''', ''' + limit + ''';'''
 
 
@@ -359,6 +372,11 @@ class FoodRecordDinnerResource(Resource):
             cursor.execute(query)
 
             result_list = cursor.fetchall()
+            i = 0
+            for row in result_list :
+                result_list[i]['createdAt'] = row['createdAt'].isoformat()
+                i = i + 1
+            
 
             cursor.close()
             connection.close()
