@@ -224,6 +224,28 @@ class UserLoginResource(Resource) :
                 result_list[i]['createdAt'] = row['createdAt'].isoformat()
                 i = i + 1
 
+
+            query = '''select u.id,u.nickName, ui.hopeWeight, ut.targetKcal, ut.targetCarbs, ut.targetProtein, ut.targetFat
+                        from user u
+                        join userInfo ui
+                        on u.id = ui.userId
+                        join userTarget ut
+                        on u.id = ut.userId
+                        where u.email = %s;'''
+
+            record = (data['email'], )
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query, record)
+
+            userInfo_list = cursor.fetchall()
+
+            # i = 0
+            # for row in result_list :
+            #     userInfo_list[i]['totalKcal'] = float(row['totalKcal'])
+
+            #     i = i + 1
+
+
             cursor.close()
             connection.close()
 
@@ -246,7 +268,12 @@ class UserLoginResource(Resource) :
         access_token = create_access_token( result_list[0]['id'] )
 
 
-        return {'result' : 'success', 'access_token' : access_token}, 200
+
+
+
+
+
+        return {'result' : 'success', 'access_token' : access_token, "userInfo_list" : userInfo_list[0]}, 200
 
 
 # #### 로그아웃 ####
