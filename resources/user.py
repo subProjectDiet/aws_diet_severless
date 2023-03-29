@@ -232,6 +232,7 @@ class UserLoginResource(Resource) :
                         join userTarget ut
                         on u.id = ut.userId
                         where u.email = %s;'''
+                        
 
             record = (data['email'], )
             cursor = connection.cursor(dictionary=True)
