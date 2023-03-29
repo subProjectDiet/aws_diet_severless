@@ -640,3 +640,6 @@ class FoodRecordTotalDayResource(Resource):
         return {"result": "success",
                 "items": json.loads(json.dumps(result_list[0], default=str)),
                 "count": len(result_list)}, 200
+
+
+#깃허브 액션 연습
