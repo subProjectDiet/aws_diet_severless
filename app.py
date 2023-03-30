@@ -6,7 +6,7 @@ from resources.user import UserTargetEditResource,UserInfoEditResource,UserEmail
 from resources.exercise import ExerciseKcalResource, ExerciseKeywordSearchResource, ExerciseSelectSearchResource, ExerciseKcalModifyDelete,ExerciseUserDirectResource, ExerciseUserDirectModifyResource, ExerciseDateKcalSum, ExerciseDateKcalList
 from resources.user import jwt_blacklist
 from resources.posting import LikeResource,MyLikePostingListResource,OrderListResource,PostingEditResource,PostingClickResource, MypostingListResource, PostingResource, PostingTagResource, LikeResource, MyLikePostingListResource, OrderListResource
-from resources.diary import DiaryUserWeightResource, DiaryEdaResource, DiaryMonthListResource
+from resources.diary import GetUserTargetIngoResource, DiaryUserWeightResource, DiaryEdaResource, DiaryMonthListResource
 from resources.exercise import ExerciseKcalResource, ExerciseKeywordSearchResource, ExerciseSelectSearchResource, ExerciseKcalModifyDelete,ExerciseUserDirectResource, ExerciseUserDirectModifyResource, ExerciseDateKcalSum, ExerciseDateKcalList
 from resources.calorie import FoodTotalDataResource, FoodRecordBreakfastResource, FoodRecordDinnerResource, FoodRecordEditResource, FoodRecordLunchResource, FoodRecordResource, FoodRecordTotalBreakfast, FoodRecordTotalDinnerResource, FoodRecordTotalLunchResource, FoodRecordUserResource, FoodResource, FoodSearchResource
 from resources.calorie import FoodRecordTotalDayResource, FoodTotalDataResource
@@ -106,6 +106,8 @@ api.add_resource(FoodTotalDataResource, '/foodRecord/total/kcal/data')
 api.add_resource(DiaryEdaResource, '/diary/eda')
 api.add_resource(DiaryUserWeightResource, '/diary')
 api.add_resource(DiaryMonthListResource, '/diary/month')
+
+api.add_resource(GetUserTargetIngoResource, '/user/target/data')
 
 # 도표부분
 api.add_resource(DayEdaResource, '/eda/day')

@@ -395,5 +395,38 @@ class DiaryMonthListResource(Resource):
                 "items" : result_list , 
                 "count" : len(result_list)}, 200
 
+class GetUserTargetIngoResource(Resource):
+# 유저가 입력한 목표 탄단지 데이터 가져오는 API
+    @jwt_required()
+    def get(self):
 
-                
+        user_id = get_jwt_identity()
+        try : 
+            connection = get_connection()
+
+            query = '''select id, userId, targetKcal, targetCarbs, targetProtein, targetFat
+                        from userTarget
+                        where userId = %s;'''
+
+            record = (user_id , )
+
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(query, record)
+
+            result_list = cursor.fetchall()
+
+
+
+            cursor.close()
+            connection.close()
+
+        except Error as e :
+            print(e)
+            cursor.close()
+            connection.close()
+            return {'error' : str(e)} , 500
+
+
+        return {'result' : 'success',
+                'items' : result_list[0] ,
+                'count' : len(result_list)  }, 200
