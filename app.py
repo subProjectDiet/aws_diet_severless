@@ -2,6 +2,7 @@ from flask import Flask
 from flask_jwt_extended import JWTManager
 from flask_restful import Api
 from config import Config
+from resources.photo import VisionTextResource
 from resources.user import UserTargetEditResource,UserInfoEditResource,UserEmailUniqueResource,UserNicknameUniqueResource,UserRegisterResource, UserInfoResource, UserTargetResource, UserLoginResource, UserLogoutResource, UserNicknameResetResource
 from resources.exercise import ExerciseKcalResource, ExerciseKeywordSearchResource, ExerciseSelectSearchResource, ExerciseKcalModifyDelete,ExerciseUserDirectResource, ExerciseUserDirectModifyResource, ExerciseDateKcalSum, ExerciseDateKcalList
 from resources.user import jwt_blacklist
@@ -116,6 +117,8 @@ api.add_resource(MonthEdaResource, '/eda/month')
 
 # 추천 시스템
 api.add_resource(KmeansRecommendResource, '/recommend')
+#구글비전
+api.add_resource(VisionTextResource,'/vision')
 
 
 
