@@ -498,8 +498,8 @@ class FoodRecordTotalDinnerResource(Resource):
                 "items": json.loads(json.dumps(result_list[0], default=str)),
                 "count": len(result_list)}, 200
 
-#특정날짜 탄수화물 총합
-class FoodRecordTotalCarbsResource(Resource):
+
+class FoodTotalDataResource(Resource):
     @jwt_required()
     def get(self):
         date_str = request.args.get('date')
@@ -509,14 +509,14 @@ class FoodRecordTotalCarbsResource(Resource):
         try:
             connection = get_connection()
 
-            query = f'''SELECT sum(carbs) as totalKcal
-                    FROM foodRecord
-                    WHERE date = '{date}' 
-                    AND userId = {user_id}
-                    group by date ;'''
+            query = '''select userId, sum(kcal) as totalKcal, sum(carbs) as totalCarbs, sum(protein) as totalProtein, sum(fat) as totalFat
+                    from foodRecord
+                    where userId = %s and date = %s
+                    group by date;'''
 
+            record = (user_id, date)
             cursor = connection.cursor(dictionary=True)
-            cursor.execute(query)
+            cursor.execute(query, record)
 
             result_list = cursor.fetchall()
 
@@ -532,75 +532,10 @@ class FoodRecordTotalCarbsResource(Resource):
         return {"result": "success",
                 "items": json.loads(json.dumps(result_list[0], default=str)),
                 "count": len(result_list)}, 200
-    
-#특정날짜 단백질 총합
-class FoodRecordTotalProteinResource(Resource):
-    @jwt_required()
-    def get(self):
-        date_str = request.args.get('date')
-        date = datetime.strptime(date_str, '%Y-%m-%d').date()
-        user_id = get_jwt_identity()
 
-        try:
-            connection = get_connection()
 
-            query = f'''SELECT sum(protein) as totalKcal
-                    FROM foodRecord
-                    WHERE date = '{date}' 
-                    AND userId = {user_id}
-                    group by date ;'''
 
-            cursor = connection.cursor(dictionary=True)
-            cursor.execute(query)
 
-            result_list = cursor.fetchall()
-
-            cursor.close()
-            connection.close()
-
-        except Error as e:
-            print(e)
-            cursor.close()
-            connection.close()
-            return {"error": str(e)}, 500
-
-        return {"result": "success",
-                "items": json.loads(json.dumps(result_list[0], default=str)),
-                "count": len(result_list)}, 200
-#특정날짜 지방 총합
-class FoodRecordTotalFatResource(Resource):
-    @jwt_required()
-    def get(self):
-        date_str = request.args.get('date')
-        date = datetime.strptime(date_str, '%Y-%m-%d').date()
-        user_id = get_jwt_identity()
-
-        try:
-            connection = get_connection()
-
-            query = f'''SELECT sum(fat) as totalKcal
-                    FROM foodRecord
-                    WHERE date = '{date}' 
-                    AND userId = {user_id}
-                    group by date ;'''
-
-            cursor = connection.cursor(dictionary=True)
-            cursor.execute(query)
-
-            result_list = cursor.fetchall()
-
-            cursor.close()
-            connection.close()
-
-        except Error as e:
-            print(e)
-            cursor.close()
-            connection.close()
-            return {"error": str(e)}, 500
-
-        return {"result": "success",
-                "items": json.loads(json.dumps(result_list[0], default=str)),
-                "count": len(result_list)}, 200
 
 #특정날짜 먹은 kcal총합
 class FoodRecordTotalDayResource(Resource):
