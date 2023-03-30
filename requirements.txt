@@ -2,6 +2,7 @@ Flask==1.1.4
 Werkzeug==1.0.1
 MarkupSafe==2.0.1
 Flask-RESTful
+mysql-connector-python
 Flask-JWT-Extended
 requests
 chardet
