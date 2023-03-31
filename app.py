@@ -6,13 +6,14 @@ from resources.user import UserTargetEditResource,UserInfoEditResource,UserEmail
 from resources.exercise import ExerciseKcalResource, ExerciseKeywordSearchResource, ExerciseSelectSearchResource, ExerciseKcalModifyDelete,ExerciseUserDirectResource, ExerciseUserDirectModifyResource, ExerciseDateKcalSum, ExerciseDateKcalList
 from resources.user import jwt_blacklist
 from resources.posting import LikeResource,MyLikePostingListResource,OrderListResource,PostingEditResource,PostingClickResource, MypostingListResource, PostingResource, PostingTagResource, LikeResource, MyLikePostingListResource, OrderListResource
-from resources.diary import GetUserTargetIngoResource, DiaryUserWeightResource, DiaryEdaResource, DiaryMonthListResource
+from resources.diary import GetUserTargetIngoResource, DiaryUserWeightResource, DiaryMonthListResource
 from resources.exercise import ExerciseKcalResource, ExerciseKeywordSearchResource, ExerciseSelectSearchResource, ExerciseKcalModifyDelete,ExerciseUserDirectResource, ExerciseUserDirectModifyResource, ExerciseDateKcalSum, ExerciseDateKcalList
 from resources.calorie import FoodTotalDataResource, FoodRecordBreakfastResource, FoodRecordDinnerResource, FoodRecordEditResource, FoodRecordLunchResource, FoodRecordResource, FoodRecordTotalBreakfast, FoodRecordTotalDinnerResource, FoodRecordTotalLunchResource, FoodRecordUserResource, FoodResource, FoodSearchResource
 from resources.calorie import FoodRecordTotalDayResource, FoodTotalDataResource
 from resources.eda import DayEdaResource, WeekEdaResource, MonthEdaResource
 from resources.positng_coment import PostingComentEditResource, PostingComentResource
 from resources.recommend import KmeansRecommendResource
+from resources.diary import EatKcalAvgCountResource, EatManyDayEdaResource, ExerciseManyDayEdaResource, MonthBurnWeightEdaResource,AvgGetDataEdaResource
 
 
 app = Flask(__name__)
@@ -103,9 +104,19 @@ api.add_resource(FoodRecordTotalDayResource, '/foodRecord/total/kcal')
 api.add_resource(FoodTotalDataResource, '/foodRecord/total/kcal/data')
 
 # 다이어리 부분
-api.add_resource(DiaryEdaResource, '/diary/eda')
 api.add_resource(DiaryUserWeightResource, '/diary')
 api.add_resource(DiaryMonthListResource, '/diary/month')
+
+
+
+# 데이터분석부분
+api.add_resource(EatKcalAvgCountResource, '/eda/eat/foodkcal')
+api.add_resource(EatManyDayEdaResource, '/eda/eat/manyday')
+api.add_resource(ExerciseManyDayEdaResource, '/eda/exercise/manyday')
+api.add_resource(MonthBurnWeightEdaResource, '/eda/burn/weight')
+api.add_resource(AvgGetDataEdaResource, '/eda/avg/data')
+
+
 
 api.add_resource(GetUserTargetIngoResource, '/user/target/data')
 
