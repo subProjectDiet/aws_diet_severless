@@ -264,7 +264,7 @@ class MonthBurnWeightEdaResource(Resource):
 
         try :
             connection = get_connection()
-            query = '''select userId, max(nowWeight) - min(nowWeight) as burnWeight
+            query = '''select userId, min(nowWeight) - max(nowWeight) as burnWeight
                     from diary
                     where userId = %s and date_format(date, '%Y-%m') = %s
                     order by date desc;'''
