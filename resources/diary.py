@@ -150,8 +150,7 @@ class DiaryEdaResource(Resource):
             if len(result_list) == 0 :
                 return {"error" : '해당 데이터는 존재하지 않습니다.'}, 400
 
-            eda_result.append("가장 많이 먹은 음식 및 칼로리")
-            eda_result.append(result_list)
+            eda_result.append({"EatKcalAvgCount" : result_list[0]})
 
 
             # 가장 많이 먹은 날의 칼로리
@@ -175,8 +174,7 @@ class DiaryEdaResource(Resource):
                 result_list[i]['date'] = row['date'].isoformat()
                 i = i + 1
 
-            eda_result.append("가장 많이 먹은 날")
-            eda_result.append(result_list)
+            eda_result.append({"EatManyDay" : result_list[0]})
 
 
             # 운동을 가장 많이한 날
@@ -202,8 +200,7 @@ class DiaryEdaResource(Resource):
                 result_list[i]['date'] = row['date'].isoformat()
                 i = i + 1
             
-            eda_result.append("운동을 가장 많이 한 날")
-            eda_result.append(result_list)
+            eda_result.append({"ExerciseManyDay":result_list[0]})
 
 
             # 평균 음식 칼로리
@@ -226,8 +223,7 @@ class DiaryEdaResource(Resource):
                 result_list[i]['foodAvgKcal'] = float(row['foodAvgKcal'])
                 i = i + 1
 
-            eda_result.append("평균 음식 칼로리")
-            eda_result.append(result_list)
+            eda_result.append({"FoodAvgKcal":result_list[0]})
 
             # 평균 운동 칼로리
             query = '''
@@ -249,8 +245,7 @@ class DiaryEdaResource(Resource):
                 result_list[i]['exerciseAvgKcal'] = float(row['exerciseAvgKcal'])
                 i = i + 1
 
-            eda_result.append("평균 운동 칼로리")
-            eda_result.append(result_list)
+            eda_result.append({"ExerciseAvgKcal":result_list[0]})
 
 
             # 평균 몸무게
@@ -272,8 +267,7 @@ class DiaryEdaResource(Resource):
                 result_list[i]['weightAvg'] = float(row['weightAvg'])
                 i = i + 1
 
-            eda_result.append("평균 몸무게")
-            eda_result.append(result_list)
+            eda_result.append({"AvgWeight":result_list[0]})
 
             # 이달의 감량 몸무게
             query = '''select userId, max(nowWeight) - min(nowWeight) as burnKcal
@@ -294,8 +288,7 @@ class DiaryEdaResource(Resource):
                 result_list[i]['burnKcal'] = float(row['burnKcal'])
                 i = i + 1
 
-            eda_result.append("이달의 감량 몸무게")
-            eda_result.append(result_list)
+            eda_result.append({"MonthBurnKcal":result_list[0]})
 
 
             # 평균 영양소별 섭취량
@@ -321,8 +314,7 @@ class DiaryEdaResource(Resource):
 
                 i = i + 1
 
-            eda_result.append("평균 영양소별 섭취량")
-            eda_result.append(result_list)
+            eda_result.append({"EatAvgCPF":result_list[0]})
 
 
 
