@@ -36,26 +36,29 @@ class UserRegisterResource(Resource) :
             print(str(e))
             return {"error" : str(e)}, 400
 
-        # 3. 비밀번호의 길이가 유효한지 체크한다.
-        # 만약, 비번이 4자리 이상 12자리 이하다라면, 
+ 
 
-        if len(data['password']) < 4 or len(data['password']) > 12 :
-            return {'error' : '비밀번호 길이 확인'} , 400
+        
 
-        # 4. 비밀번호를 암호화 한다.
-        hashed_password = hash_password(data['password'])
-        print(hashed_password)
 
-        # 5. DB 에 회원정보를 저장한다.
+        # 3. DB 에 회원정보를 저장한다.
 
         try :
             # 데이터베이스 연결 코드
             connection = get_connection()
-            query = '''insert into user(email,nickName, password)
-                    values
-                    (%s, %s, %s);'''
-                    
-            record = (data['email'], data['nickName'], hashed_password)
+            query = '''INSERT INTO user ( email, nickName, password,accountType) 
+                VALUES (%s, %s, %s,%s);
+                       '''
+                       
+            # 4. 비밀번호를 암호화 한다.
+            if 'password' in data:
+                hashed_password = hash_password( data['password'] ) 
+                              
+                record = (data['email'], data['nickName'], hashed_password, data['accountType'])
+            else:
+                record = (data['email'], data['nickName'], None, data['accountType'])
+                                    
+    
 
             cursor = connection.cursor()
             cursor.execute(query, record)
@@ -204,12 +207,12 @@ class UserLoginResource(Resource) :
             connection = get_connection()
 
             # 변수부분은 %s 처리
-            query = '''select * 
-                    from user
-                    where email = %s;'''
+            query = ''' select * 
+                from user
+                where email = %s and accountType = %s'''
 
             # 변수와 매칭되는 데이터를 가져온다
-            record = (data['email'], )
+            record = (data['email'],data['accountType'])
 
             cursor = connection.cursor(dictionary= True)
             cursor.execute(query, record)
@@ -259,15 +262,22 @@ class UserLoginResource(Resource) :
 
         print(result_list)
 
-        # 3. 비밀번호가 맞는지 확인한다.
-        check = check_password(data['password'], result_list[0]['password'])
+        if 'password' in data :
+             # 3. 비밀번호를 비교한다.
+            check = check_password(data['password'], result_list[0]['password']) 
 
-        if check == False :
-            return {'error' : '비밀번호가 잘못됐습니다.'}, 400
-            
-        # 4. jwt 토큰을 만들어서 클라이언트에게 보낸다.
-        access_token = create_access_token( result_list[0]['id'] )
+            if check == False :
+                return {'error' : '비밀번호가 틀렸습니다.'}, 400
 
+            # 4. id를 jwt 토큰을 만들어서 클라이언트에게 보낸다.
+            access_token = create_access_token(identity=result_list[0]['id'] ) # identity는 토큰에 담길 내용이다. # 담을게 여러개면 딕셔너리 형태로담는다.
+
+            return {'nickName' : result_list[0]['nickName'],'access_token': access_token}, 200 # 200은 성공했다는 의미의 코드
+
+        else :
+            if data['accountType'] == 1 :
+                access_token = create_access_token(identity=result_list[0]['id'] ) # identity는 토큰에 담길 내용이다. # 담을게 여러개면 딕셔너리 형태로담는다.
+                return {'nickName' : result_list[0]['nickName'],'access_token': access_token}, 200 # 200은 성공했다는 의미의 코드
 
 
 
