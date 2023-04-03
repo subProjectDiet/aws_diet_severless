@@ -51,9 +51,9 @@ class UserRegisterResource(Resource) :
         try :
             # 데이터베이스 연결 코드
             connection = get_connection()
-            query = '''insert into user(email,nickName, password)
-                    values
-                    (%s, %s, %s);'''
+            query = '''INSERT INTO user ( email, password, nickname,accountType) 
+                VALUES (%s, %s, %s,%s);
+                    '''
                     
             record = (data['email'], data['nickName'], hashed_password)
 
@@ -204,9 +204,9 @@ class UserLoginResource(Resource) :
             connection = get_connection()
 
             # 변수부분은 %s 처리
-            query = '''select * 
-                    from user
-                    where email = %s;'''
+            query = ''' select * 
+                from user
+                where email = %s and accountType = %s'''
 
             # 변수와 매칭되는 데이터를 가져온다
             record = (data['email'], )
