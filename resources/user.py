@@ -272,19 +272,19 @@ class UserLoginResource(Resource) :
             # 4. id를 jwt 토큰을 만들어서 클라이언트에게 보낸다.
             access_token = create_access_token(identity=result_list[0]['id'] ) # identity는 토큰에 담길 내용이다. # 담을게 여러개면 딕셔너리 형태로담는다.
 
-            return {'nickName' : result_list[0]['nickName'],'access_token': access_token}, 200 # 200은 성공했다는 의미의 코드
+            return {'result' : 'success', 'access_token' : access_token, "userInfo_list" : userInfo_list[0]}, 200
 
         else :
             if data['accountType'] == 1 :
                 access_token = create_access_token(identity=result_list[0]['id'] ) # identity는 토큰에 담길 내용이다. # 담을게 여러개면 딕셔너리 형태로담는다.
-                return {'nickName' : result_list[0]['nickName'],'access_token': access_token}, 200 # 200은 성공했다는 의미의 코드
+                return {'result' : 'success', 'access_token' : access_token, "userInfo_list" : userInfo_list[0]}, 200
 
 
 
 
 
 
-        return {'result' : 'success', 'access_token' : access_token, "userInfo_list" : userInfo_list[0]}, 200
+        
 
 
 # #### 로그아웃 ####
