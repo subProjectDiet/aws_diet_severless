@@ -27,7 +27,7 @@ class DayEdaResource(Resource):
                         on d.userId = f.userId and d.date = f.date
                         left join exerciseRecord e
                         on d.userId = e.userId and d.date = e.date
-                        where d.userId = %s and d.date < CURRENT_DATE() and date_format(d.date, '%Y-%m') = %s
+                        where d.userId = %s and date_format(d.date, '%Y-%m') = %s
                         group by d.date
                         order by d.date desc
                         limit 5;'''
