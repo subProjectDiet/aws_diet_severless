@@ -21,10 +21,12 @@ class DayEdaResource(Resource):
         try :
             connection = get_connection()
 
-            query = '''select d.userId, d.date, round(ifnull( d.nowWeight, 0),1) as nowWeight, round(ifnull(sum(f.kcal), 0),0) as totalKcal
+            query = '''select d.userId, d.date, round(ifnull( d.nowWeight, 0),1) as nowWeight, round(ifnull(sum(f.kcal), 0),0) as totalKcal, round(ifnull(sum(e.totalKcalBurn), 0),0) as totalKcalBurn
                         from diary d
                         left join foodRecord f
                         on d.userId = f.userId and d.date = f.date
+                        left join exerciseRecord e
+                        on d.userId = e.userId and d.date = e.date
                         where d.userId = %s and d.date < CURRENT_DATE() and date_format(d.date, '%Y-%m') = %s
                         group by d.date
                         order by d.date desc
