@@ -78,7 +78,7 @@ class WeekEdaResource(Resource):
                                 date_format(DATE_SUB(d.date, interval (DAYOFWEEK(d.date)-1) day), '%Y-%m-%d') as start,
                                 date_format(DATE_SUB(d.date, interval (DAYOFWEEK(d.date)-7) day), '%Y-%m-%d') as end
                         from diary d
-                        left join foodRecord fs
+                        left join foodRecord f
                         on d.userId = f.userId and d.date = f.date
                         where d.userId = %s and d.date < CURRENT_DATE() and date_format(d.date, '%Y-%m') = %s
                         group by start
