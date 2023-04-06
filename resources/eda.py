@@ -127,21 +127,23 @@ class MonthEdaResource(Resource):
     @jwt_required()
     def get(self) :
         
-        date = request.args.get('date')
         user_id = get_jwt_identity()
 
         try :
             connection = get_connection()
 
-            query = '''select d.userId,  month(d.date) as `month`, round(ifnull(avg(nowWeight),0),1) as AvgWeight,
-                        round(ifnull(avg(f.kcal),0),0) as AvgKcal
+            query = '''select  d.userId,  month(d.date) as `month`, round(ifnull(avg(nowWeight),0),1) as AvgWeight,
+                        round(ifnull(avg(f.kcal),0),0) as AvgKcal,
+                        round(ifnull(avg(e.totalKcalBurn), 0),0) as AvgKcalBurn
                         from diary d
                         left join foodRecord f
                         on d.userId = f.userId and d.date = f.date
-                        where d.userId = %s and d.date < CURRENT_DATE()
+                        left join exerciseRecord e
+                        on d.userId = e.userId and d.date = e.date
+                        where d.userId = %s 
                         group by `month`
-                        order by `month` desc
-                        limit 5;'''
+                        order by `month`
+                        limit 5'''
 
             record = (user_id, )
 
