@@ -132,18 +132,19 @@ class MonthEdaResource(Resource):
         try :
             connection = get_connection()
 
-            query = '''select  d.userId,  month(d.date) as `month`, round(ifnull(avg(nowWeight),0),1) as AvgWeight,
-                        round(ifnull(avg(f.kcal),0),0) as AvgKcal,
-                        round(ifnull(avg(e.totalKcalBurn), 0),0) as AvgKcalBurn
-                        from diary d
-                        left join foodRecord f
-                        on d.userId = f.userId and d.date = f.date
-                        left join exerciseRecord e
-                        on d.userId = e.userId and d.date = e.date
-                        where d.userId = %s 
-                        group by `month`
-                        order by `month`
-                        limit 5'''
+            query = '''select  d.userId, round(ifnull(avg(nowWeight),0),1) as AvgWeight,
+                    round(ifnull(avg(f.kcal),0),0) as AvgKcal,
+                    round(ifnull(avg(e.totalKcalBurn), 0),0) as AvgKcalBurn,
+                    date_format(DATE_SUB(d.date, interval (DAYOFWEEK(d.date)-1) day), '%Y-%m') as `month`
+                    from diary d
+                    left join foodRecord f
+                    on d.userId = f.userId and d.date = f.date
+                    left join exerciseRecord e
+                    on d.userId = e.userId and d.date = e.date
+                    where d.userId = %s
+                    group by `month`
+                    order by `month` desc
+                    limit 5;'''
 
             record = (user_id, )
 
