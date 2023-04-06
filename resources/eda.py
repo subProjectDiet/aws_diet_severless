@@ -70,37 +70,42 @@ class WeekEdaResource(Resource):
     @jwt_required()
     def get(self) :
 
-        date = request.args.get('date')
         user_id = get_jwt_identity()
 
         try :
             connection = get_connection()
 
             query = '''select d.userId, round(ifnull(avg(nowWeight),0),1) as AvgWeight , round(ifnull(avg(f.kcal),0),1) as AvgKcal ,
-                                date_format(DATE_SUB(d.date, interval (DAYOFWEEK(d.date)-1) day), '%Y-%m-%d') as start,
-                                date_format(DATE_SUB(d.date, interval (DAYOFWEEK(d.date)-7) day), '%Y-%m-%d') as end
+                        round(ifnull(avg(e.totalKcalBurn), 0),0) as AvgKcalBurn,
+                        date_format(DATE_SUB(d.date, interval (DAYOFWEEK(d.date)-1) day), '%Y-%m-%d') as start,
+                        date_format(DATE_SUB(d.date, interval (DAYOFWEEK(d.date)-7) day), '%Y-%m-%d') as end
                         from diary d
                         left join foodRecord f
                         on d.userId = f.userId and d.date = f.date
-                        where d.userId = %s and d.date < CURRENT_DATE() and date_format(d.date, '%Y-%m') = %s
+                        left join exerciseRecord e
+                        on d.userId = e.userId and d.date = e.date
+                        where d.userId = %s 
                         group by start
                         order by start desc
                         limit 5;'''
 
-            record = (user_id, date)
+            record = (user_id, )
 
             cursor = connection.cursor(dictionary=True)
 
             cursor.execute(query, record)
 
             result_list = cursor.fetchall()
+            print(result_list)
+
+            
 
             i = 0
             for row in result_list :
-                # result_list[i]['start'] = row['start'].isoformat()
-                # result_list[i]['end'] = row['end'].isoformat()
+                # result_list[i]['date'] = row['date'].isoformat()
                 result_list[i]['AvgWeight'] = float(row['AvgWeight'])
                 result_list[i]['AvgKcal'] = float(row['AvgKcal'])
+                result_list[i]['AvgKcalBurn'] = float(row['AvgKcalBurn'])
 
                 i = i + 1
 
